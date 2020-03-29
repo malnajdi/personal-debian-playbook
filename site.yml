@@ -1,0 +1,7 @@
+---
+- name: Baseline configuration
+  hosts: all
+  become: yes
+  connection: local
+  roles:
+    - role: base

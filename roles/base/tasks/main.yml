@@ -1,0 +1,74 @@
+---
+# tasks file for base
+- name: Install essential packages
+  apt:
+    name: "{{ essential_packages }}"
+
+- name: Create default directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop: "{{ directories }}"
+
+# Compton
+- name: Configure Compton
+  template:
+    src: compton.conf.j2
+    dest: "{{ user_config_path }}/compton/compton.conf"
+  notify: restart compton
+
+# Xmonad
+- name: Configure xmonad
+  template:
+    src: xmonad.hs.j2
+    dest: "{{ xmonad_config_path }}/xmonad.hs"
+  notify: restart xmonad
+
+# Suckless Terminal
+# TODO package should be downloaded and extracted and built
+# File should be exists in this role.
+- name: Check if suckless terminal (st) is installed 
+  stat:
+    path: /usr/local/bin/st
+  register: st_installed
+
+- name: Extract suckless terminal (st)
+  unarchive:
+    src: st-0.8.2.tar.gz
+    dest: "{{ user_config_path }}"
+  when: not st_installed.stat.exists
+
+- name: Configure suckless terminal (st)
+  template:
+    src: st_config.h.j2
+    dest: "{{ user_config_path }}/st-0.8.2/config.h"
+  register: st_configured
+
+- name: Build Suckless terminal (st)
+  command: make clean install
+  args: 
+    chdir: "{{ user_config_path }}/st-0.8.2/"
+  when: st_configured.changed
+
+# Nitrogen & wallpapers
+- name: Copy wallpapers
+  synchronize:
+    src: wallpapers/
+    dest: "{{ user_wallpaper_path }}"
+
+- name: Configure nitrogen & wallpaper
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ user_config_path }}/nitrogen/{{ item }}"
+  loop: 
+    - nitrogen.cfg
+    - bg-saved.cfg
+  notify: restore nitrogen
+
+# Lock Screen (i3lock)
+- name: Scale lockscreen wallpaper
+  command: "convert -scale 1920x1080 {{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png {{ user_wallpaper_path }}/lockscreen.png"
+  notify: restart xmonad
+
+
+# TODO: Polybar

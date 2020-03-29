@@ -1,0 +1,14 @@
+---
+user_home_path: "/home/{{ user }}"
+user_config_path: "{{ user_home_path }}/.config"
+user_wallpaper_path: "{{ user_home_path }}/Wallpapers"
+
+directories:
+  - "{{ user_config_path }}/compton"
+
+xmonad_config_path: "{{ user_home_path }}/.xmonad"
+
+polybar_repository: https://github.com/polybar/polybar.git
+polybar_packages:
+  - 
+

@@ -1,0 +1,35 @@
+---
+user: malnajdi
+group: malnajdi
+essential_packages:
+  - lightdm
+  - compton
+  - pcmanfm
+  - nitrogen
+  - geany
+  - menu
+  - aptitude
+  - suckless-tools
+  - htop
+  - net-tools
+  - sudo
+  - imagemagick
+  - i3lock
+  - xmonad
+  - libghc-xmonad-dev
+  - libghc-xmonad-contrib-dev
+  - ansible
+  - mercurial
+  - git
+  - rsync
+
+# The name of the default wallpaper to be used
+# Name is the exact name in the files/wallpaper folder.
+default_user_wallpaper_name: "4"
+
+# Compton
+compton_opacity_apps:
+  - name: st
+    opacity: 80
+  - name: code
+    opacity: 80

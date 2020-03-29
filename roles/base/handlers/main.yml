@@ -1,0 +1,15 @@
+---
+- name: restart xmonad
+  command: xmonad --restart
+
+- name: restore nitrogen
+  command: nitrogen --restore
+  become: true
+  become_user: "{{ user }}"
+
+- name: restart compton
+  shell: "killall compton && compton --config /home/malnajdi/.config/compton/compton.conf &"
+  ignore_errors: yes
+
+- name: reload deamon
+  command: "systemctl daemon-reload"
