@@ -4,6 +4,12 @@
   apt:
     name: "{{ essential_packages }}"
 
+- name: Install Snaps Packages
+  snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic }}"
+  loop: "{{ snap_packages }}"
+
 - name: Create default directories
   file:
     path: "{{ item }}"
@@ -83,6 +89,7 @@
   notify: restart xmonad
 
 # Polybar
+# TODO: If polybar is installed ignore building
 - name: Install polybar required packages
   apt:
     name: "{{ polybar_packages }}"
@@ -96,3 +103,16 @@
   command: "./build.sh"
   args:
     chdir: "{{ user_home_path }}/polybar"
+
+# Polybar Theme
+- name: Configure polybar theme
+  template:
+    src: "polybar/{{ item }}.j2"
+    dest: "{{ user_config_path }}/polybar/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+  loop:
+    - launch.sh
+    - config.ini
+  notify:
+    - restart xmonad

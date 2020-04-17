@@ -22,6 +22,14 @@ essential_packages:
   - mercurial
   - git
   - rsync
+  - surf
+  - pulseaudio
+  - zsh
+  - snapd
+
+snap_packages:
+  - name: code
+    classic: yes
 
 # The name of the default wallpaper to be used
 # Name is the exact name in the files/wallpaper folder.
@@ -33,3 +41,6 @@ compton_opacity_apps:
     opacity: 80
   - name: code
     opacity: 80
+
+# Polybar
+default_polybar_bar: "example"

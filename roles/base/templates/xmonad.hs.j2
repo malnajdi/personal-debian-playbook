@@ -69,7 +69,7 @@ import XMonad.Prompt (defaultXPConfig, XPConfig(..), XPPosition(Top), Direction1
 myFont          = "xft:3270 Narrow Nerd Font Complete:Medium:pixelsize=12"
 myModMask       = mod4Mask  -- Sets modkey to super/windows key
 myTerminal      = "st"      -- Sets default terminal
-myTextEditor    = "nano"     -- Sets default text editor
+myTextEditor    = "nano"    -- Sets default text editor
 myBorderWidth   = 1         -- Sets border width for windows
 
 main = do
@@ -92,8 +92,7 @@ main = do
 myStartupHook = do
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &" 
-          spawnOnce "polybar -c ~/.config/polybar/config.ini top &"
-          spawnOnce "polybar -c ~/.config/polybar/config.ini bottom &"
+          spawn "killall polybar && polybar -c {{ user_config_path }}/polybar/config.ini example &"
           
 ------------------------------------------------------------------------
 ---GRID SELECT
@@ -147,7 +146,7 @@ myKeys =
           , ("Geany", "geany")
           , ("File Explorer", "pcmanfm")
           , ("Simple Terminal", "st")
-          , ("VSCode", "code")
+          , ("VSCode", "snap run code")
           ])
 
         , ("M-S-g", goToSelected $ mygridConfig myColorizer)
