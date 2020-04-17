@@ -92,7 +92,7 @@ main = do
 myStartupHook = do
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &" 
-          spawn "killall polybar && polybar -c {{ user_config_path }}/polybar/config.ini example &"
+          spawn "sh /home/malnajdi/.config/polybar/launch.sh"
           
 ------------------------------------------------------------------------
 ---GRID SELECT

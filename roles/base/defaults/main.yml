@@ -26,6 +26,7 @@ essential_packages:
   - pulseaudio
   - zsh
   - snapd
+  - rofi
 
 snap_packages:
   - name: code
@@ -40,7 +41,7 @@ compton_opacity_apps:
   - name: st
     opacity: 80
   - name: code
-    opacity: 80
+    opacity: 90
 
 # Polybar
 default_polybar_bar: "example"

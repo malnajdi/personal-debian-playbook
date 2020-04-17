@@ -81,12 +81,15 @@
   loop: 
     - nitrogen.cfg
     - bg-saved.cfg
+  register: nitrogen_status
   notify: restore nitrogen
+  
 
 # Lock Screen (i3lock)
 - name: Scale lockscreen wallpaper
   command: "convert -scale 1920x1080 {{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png {{ user_wallpaper_path }}/lockscreen.png"
   notify: restart xmonad
+  when: nitrogen_status.changed
 
 # Polybar
 # TODO: If polybar is installed ignore building
@@ -98,21 +101,27 @@
   git:
     repo: "{{ polybar_repository }}"
     dest: "{{ user_home_path }}/polybar"
+  register: polybar_repo_status
     
 - name: Build polybar
   command: "./build.sh"
   args:
     chdir: "{{ user_home_path }}/polybar"
+  when: polybar_repo_status.changed
 
 # Polybar Theme
 - name: Configure polybar theme
   template:
-    src: "polybar/{{ item }}.j2"
-    dest: "{{ user_config_path }}/polybar/{{ item }}"
+    src: "polybar/{{ item.name }}.j2"
+    dest: "{{ user_config_path }}/polybar/{{ item.name }}"
     owner: "{{ user }}"
     group: "{{ group }}"
+    mode: "{{ item.mode }}"
   loop:
-    - launch.sh
-    - config.ini
+    - {'name': 'config.ini', 'mode': 640}
+    - {'name': 'modules.ini', 'mode': 640}
+    - {'name': 'bars.ini', 'mode': 640}
+    - {'name': 'colors.ini', 'mode': 640}
+    - {'name': 'launch.sh', 'mode': a+x}
   notify:
     - restart xmonad
