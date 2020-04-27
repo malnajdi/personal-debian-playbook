@@ -27,6 +27,12 @@ essential_packages:
   - zsh
   - snapd
   - rofi
+  - ruby-sass
+  - maven
+  - virtualenvwrapper
+  - xclip
+  - simplescreenrecorder
+  - vlc
 
 snap_packages:
   - name: code
