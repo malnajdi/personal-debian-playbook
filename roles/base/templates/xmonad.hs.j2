@@ -138,7 +138,8 @@ myKeys =
         , ("M-<Delete>", withFocused $ windows . W.sink)  -- Push floating window back to tile.
         , ("M-S-<Delete>", sinkAll)                  -- Push ALL floating windows back to tile.
 
-
+    --- Keyboard Language 
+        , ("M1-S-1", spawn "sh /home/malnajdi/.config/change-lang.sh")
     --- Grid Select
         , (("M-S-t"), spawnSelected'
           [ ("Nitrogen", "nitrogen")

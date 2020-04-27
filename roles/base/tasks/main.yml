@@ -92,22 +92,27 @@
   when: nitrogen_status.changed
 
 # Polybar
-# TODO: If polybar is installed ignore building
+- name: Check if polybar is installed
+  stat:
+    path: /usr/local/bin/polybar
+  register: polybar_status
+
 - name: Install polybar required packages
   apt:
     name: "{{ polybar_packages }}"
+  when: not polybar_status.stat.exists
 
 - name: Get polybar repository
   git:
     repo: "{{ polybar_repository }}"
     dest: "{{ user_home_path }}/polybar"
-  register: polybar_repo_status
+  when: not polybar_status.stat.exists
     
 - name: Build polybar
   command: "./build.sh"
   args:
     chdir: "{{ user_home_path }}/polybar"
-  when: polybar_repo_status.changed
+  when: not polybar_status.stat.exists
 
 # Polybar Theme
 - name: Configure polybar theme
@@ -123,5 +128,16 @@
     - {'name': 'bars.ini', 'mode': 640}
     - {'name': 'colors.ini', 'mode': 640}
     - {'name': 'launch.sh', 'mode': a+x}
+  notify:
+    - restart xmonad
+
+# Language
+- name: Create change language script
+  template:
+    src: change-lang.sh.j2
+    dest: "{{ user_config_path }}/change-lang.sh"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: a+x
   notify:
     - restart xmonad
