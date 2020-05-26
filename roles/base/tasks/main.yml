@@ -160,3 +160,12 @@
   notify:
     - reconfigure fontconfig
     - restart xmonad
+
+# Bash Aliases
+- name: Enable bash aliases
+  template: 
+    src: .bash_aliases.j2
+    dest: "{{ user_home_path }}/.bash_aliases"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
