@@ -84,7 +84,6 @@
   register: nitrogen_status
   notify: restore nitrogen
   
-
 # Lock Screen (i3lock)
 - name: Scale lockscreen wallpaper
   command: "convert -scale 1920x1080 {{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png {{ user_wallpaper_path }}/lockscreen.png"
@@ -140,4 +139,24 @@
     group: "{{ group }}"
     mode: a+x
   notify:
+    - restart xmonad
+
+# Fonts
+- name: Disable 70-no-bitmaps.conf
+  file:
+    path: "/etc/fonts/conf.d/70-no-bitmaps.conf"
+    state: absent
+  notify:
+    - reconfigure fontconfig
+    - restart xmonad
+
+- name: Enable 70-yes-bitmaps.conf
+  file:
+    src: "/usr/share/fontconfig/conf.avail/70-yes-bitmaps.conf"
+    dest: "/etc/fonts/conf.d/70-yes-bitmaps.conf"
+    owner: root
+    group: root
+    state: link
+  notify:
+    - reconfigure fontconfig
     - restart xmonad

@@ -28,6 +28,7 @@ essential_packages:
   - snapd
   - rofi
   - ruby-sass
+  - node-less
   - maven
   - virtualenvwrapper
   - xclip
@@ -51,3 +52,8 @@ compton_opacity_apps:
 
 # Polybar
 default_polybar_bar: "example"
+
+# St
+st_patches:
+  - url: https://st.suckless.org/patches/scrollback/st-scrollback-0.8.2.diff
+    name: st-scrollback-0.8.2

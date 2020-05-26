@@ -13,3 +13,6 @@
 
 - name: reload deamon
   command: "systemctl daemon-reload"
+
+- name: reconfigure fontconfig
+  command: "dpkg-reconfigure fontconfig"
