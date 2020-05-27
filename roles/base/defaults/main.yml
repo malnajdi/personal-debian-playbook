@@ -47,14 +47,9 @@ default_user_wallpaper_name: "5"
 # Compton
 compton_opacity_apps:
   - name: st
-    opacity: 80
+    opacity: 90
   - name: code
     opacity: 90
 
 # Polybar
-default_polybar_bar: "example"
-
-# St
-st_patches:
-  - url: https://st.suckless.org/patches/scrollback/st-scrollback-0.8.2.diff
-    name: st-scrollback-0.8.2
+default_polybar_bar: "example"    
