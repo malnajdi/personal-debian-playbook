@@ -18,6 +18,7 @@ essential_packages:
   - xmonad
   - libghc-xmonad-dev
   - libghc-xmonad-contrib-dev
+  - xmobar
   - ansible
   - mercurial
   - git
@@ -50,6 +51,3 @@ compton_opacity_apps:
     opacity: 90
   - name: code
     opacity: 90
-
-# Polybar
-default_polybar_bar: "example"    

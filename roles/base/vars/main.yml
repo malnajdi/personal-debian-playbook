@@ -7,31 +7,6 @@ directories:
   - "{{ user_config_path }}"
   - "{{ user_config_path }}/compton"
   - "{{ user_config_path }}/nitrogen"
-  - "{{ user_config_path }}/polybar"
 
 xmonad_config_path: "{{ user_home_path }}/.xmonad"
-
-polybar_repository: https://github.com/polybar/polybar.git
-polybar_packages:
-  - cmake
-  - cmake-data
-  - libcairo2-dev
-  - libxcb1-dev
-  - libxcb-ewmh-dev
-  - libxcb-icccm4-dev
-  - libxcb-image0-dev
-  - libxcb-randr0-dev
-  - libxcb-util0-dev
-  - libxcb-xkb-dev
-  - libxcb-xrm-dev
-  - libxcb-composite0
-  - libxcb-composite0-dev
-  - pkg-config
-  - python-xcbgen
-  - xcb-proto
-  - i3-wm
-  - libasound2-dev
-  - libmpdclient-dev
-  - libiw-dev
-  - libpulse-dev
 

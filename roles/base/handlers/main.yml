@@ -16,3 +16,6 @@
 
 - name: reconfigure fontconfig
   command: "dpkg-reconfigure fontconfig"
+
+- name: update font cache
+  command: "fc-cache -f"
