@@ -19,3 +19,6 @@
 
 - name: update font cache
   command: "fc-cache -f"
+ 
+- name: restart polkit
+  command: service polkit restart

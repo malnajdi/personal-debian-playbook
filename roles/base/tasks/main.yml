@@ -1,5 +1,18 @@
 ---
 # tasks file for base
+- name: APT - set sources
+  template:
+    src: "{{ item.src }}.j2"
+    dest: "/etc/apt/{{ item.dest }}"
+  loop:
+    - {'src': 'sources.list', 'dest': 'sources.list'}
+    - {'src': 'backports.list', 'dest': 'sources.list.d/backports.list'}
+  register: apt_debian_sources
+
+- name: APT - update debian sources
+  apt: update_cache=yes
+  when: apt_debian_sources.changed
+
 - name: Install essential packages
   apt:
     name: "{{ essential_packages }}"
@@ -9,6 +22,7 @@
     name: "{{ item.name }}"
     classic: "{{ item.classic }}"
   loop: "{{ snap_packages }}"
+  ignore_errors: yes
 
 - name: Create default directories
   file:
@@ -104,11 +118,13 @@
   notify: restore nitrogen
   
 # Lock Screen (i3lock)
-- name: Scale lockscreen wallpaper
-  command: "convert -scale 1920x1080 {{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png {{ user_wallpaper_path }}/lockscreen.png"
-  notify: restart xmonad
-  when: nitrogen_status.changed
-
+- name: Configure i3lock script
+  template:
+    src: lock_multi_screen.sh.j2
+    dest: "{{ user_config_path }}/i3lock/lock_multi_screen.sh"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+  
 # Language
 - name: Create change language script
   template:
@@ -128,3 +144,9 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
+
+- name: Configure polkit user mount policy
+  template:
+    src: allow-mount-policy.pkla.j2
+    dest: /etc/polkit-1/localauthority/50-local.d/allow-mount-policy.pkla
+  notify: restart polkit

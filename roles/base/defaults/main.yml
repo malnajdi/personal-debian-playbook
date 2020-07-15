@@ -36,6 +36,8 @@ essential_packages:
   - simplescreenrecorder
   - vlc
   - exa
+  - build-essential
+  - keepass2
 
 snap_packages:
   - name: code
@@ -43,7 +45,7 @@ snap_packages:
 
 # The name of the default wallpaper to be used
 # Name is the exact name in the files/wallpaper folder.
-default_user_wallpaper_name: "5"
+default_user_wallpaper_name: "4"
 
 # Compton
 compton_opacity_apps:

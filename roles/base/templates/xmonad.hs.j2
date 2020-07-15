@@ -103,6 +103,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
+          spawnOnce "xrandr --output DP-3 --off --output DVI-I-0 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1080x360 --rotate normal --output DP-5 --off --output DP-4 --mode 1920x1080 --pos 3000x360 --rotate normal --output DVI-I-1 --off --output DP-2 --off --output DP-1 --off --output DP-0 --mode 1920x1080 --pos 0x0 --rotate left &"
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
 
@@ -137,7 +138,6 @@ spawnSelected' lst = gridselect conf lst >>= flip whenJust spawn
 myAppGrid :: [([Char], [Char])]
 myAppGrid = [ ("Nitrogen", "nitrogen")
             , ("Firefox", "firefox")
-            , ("Emacs", "emacs")
             , ("Firefox", "firefox")
             , ("Geany", "geany")
             , ("File Explorer", "pcmanfm")
@@ -147,6 +147,7 @@ myAppGrid = [ ("Nitrogen", "nitrogen")
             , ("LibreOffice Writer", "lowriter")
             , ("OBS", "obs")
             , ("Steam", "steam")
+            , ("Keepass", "keepass2")
             ]
 
 ------------------------------------------------------------------------
@@ -158,7 +159,7 @@ myKeys =
         [ ("M-C-r", spawn "xmonad --recompile")      -- Recompiles xmonad
         , ("M-S-r", spawn "xmonad --restart")        -- Restarts xmonad
         , ("M-S-q", io exitSuccess)                  -- Quits xmonad
-        , ("M-S-l", spawn "i3lock -i /home/malnajdi/Wallpapers/lockscreen.png")                  -- lock screen
+        , ("M-S-l", spawn "sh /home/malnajdi/.config/i3lock/lock_multi_screen.sh")        -- lock screen
     
     --- Windows
         , ("M-S-c", kill1)                           -- Kill the currently focused client

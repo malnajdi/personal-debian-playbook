@@ -7,6 +7,9 @@ directories:
   - "{{ user_config_path }}"
   - "{{ user_config_path }}/compton"
   - "{{ user_config_path }}/nitrogen"
+  - "{{ user_config_path }}/i3lock"
+  - "{{ user_config_path }}/xmobar"
+  - "{{ user_home_path }}/.xmonad"
 
 xmonad_config_path: "{{ user_home_path }}/.xmonad"
 
