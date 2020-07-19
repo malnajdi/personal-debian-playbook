@@ -15,7 +15,7 @@ Config { font = "xft:3270 Narrow Nerd Font Complete:Medium:pixelsize=13:antialia
                       -- Time and date
                       Run Date "\xf133 %b %d %Y (%H:%M)" "date" 50
                       -- Network up and down
-                    , Run Network "enp0s3" ["-t", "\xf0aa <rx>kb  \xf0ab <tx>kb"] 20
+                    , Run Network "enp0s31f6" ["-t", "\xf0aa <rx>kb  \xf0ab <tx>kb"] 20
                       -- Cpu usage in percent
                     , Run Cpu ["-t", "\xf108 CPU: (<total>%)","-H","50","--high","red"] 20
                       -- Ram used number and percent
@@ -30,5 +30,5 @@ Config { font = "xft:3270 Narrow Nerd Font Complete:Medium:pixelsize=13:antialia
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " <fc=#666666>|</fc> %UnsafeStdinReader% }{ <fc=#b3afc2> %uname% </fc><fc=#666666>| </fc><fc=#FFB86C>%cpu% </fc><fc=#666666>| </fc><fc=#FF5555>%memory% </fc><fc=#666666>| </fc><fc=#82AAFF>%disku% </fc><fc=#666666>| </fc><fc=#c3e88d>%enp0s3% </fc><fc=#666666>| </fc><fc=#8BE9FD>%date%</fc> "
+       , template = " <fc=#666666>|</fc> %UnsafeStdinReader% }{ <fc=#b3afc2> %uname% </fc><fc=#666666>| </fc><fc=#FFB86C>%cpu% </fc><fc=#666666>| </fc><fc=#FF5555>%memory% </fc><fc=#666666>| </fc><fc=#82AAFF>%disku% </fc><fc=#666666>| </fc><fc=#c3e88d>%enp0s31f6% </fc><fc=#666666>| </fc><fc=#8BE9FD>%date%</fc> "
        }
