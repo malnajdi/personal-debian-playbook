@@ -38,6 +38,8 @@ essential_packages:
   - exa
   - build-essential
   - keepass2
+  - obs-studio
+  - fonts-font-awesome
 
 snap_packages:
   - name: code
