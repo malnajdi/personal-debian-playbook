@@ -40,9 +40,12 @@ essential_packages:
   - keepass2
   - obs-studio
   - fonts-font-awesome
+  - gimp
 
 snap_packages:
   - name: code
+    classic: yes
+  - name: shotcut
     classic: yes
 
 # The name of the default wallpaper to be used
