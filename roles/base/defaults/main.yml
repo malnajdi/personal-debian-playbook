@@ -41,6 +41,7 @@ essential_packages:
   - obs-studio
   - fonts-font-awesome
   - gimp
+  - mediainfo
 
 snap_packages:
   - name: code
