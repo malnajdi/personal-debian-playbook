@@ -43,11 +43,10 @@ essential_packages:
   - gimp
   - mediainfo
   - pavucontrol
+  - kdenlive
 
 snap_packages:
   - name: code
-    classic: yes
-  - name: shotcut
     classic: yes
 
 # The name of the default wallpaper to be used
