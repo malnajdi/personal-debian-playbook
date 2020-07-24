@@ -42,6 +42,7 @@ essential_packages:
   - fonts-font-awesome
   - gimp
   - mediainfo
+  - pavucontrol
 
 snap_packages:
   - name: code
