@@ -4,7 +4,7 @@ group: malnajdi
 essential_packages:
   - lightdm
   - compton
-  - pcmanfm
+  - thunar
   - nitrogen
   - geany
   - menu
@@ -51,7 +51,7 @@ snap_packages:
 
 # The name of the default wallpaper to be used
 # Name is the exact name in the files/wallpaper folder.
-default_user_wallpaper_name: "5"
+default_user_wallpaper_name: "6"
 
 # Compton
 compton_opacity_apps:
