@@ -44,6 +44,7 @@ essential_packages:
   - mediainfo
   - pavucontrol
   - kdenlive
+  - rxvt-unicode
 
 snap_packages:
   - name: code
@@ -55,7 +56,5 @@ default_user_wallpaper_name: "6"
 
 # Compton
 compton_opacity_apps:
-  - name: st
-    opacity: 90
   - name: code
     opacity: 90

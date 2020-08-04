@@ -22,3 +22,6 @@
  
 - name: restart polkit
   command: service polkit restart
+
+- name: reload xresources
+  command: "xrdb /home/malnajdi/.Xresources"

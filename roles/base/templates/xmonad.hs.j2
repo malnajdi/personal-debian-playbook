@@ -85,7 +85,7 @@ myModMask :: KeyMask
 myModMask = mod4Mask       -- Sets modkey to super/windows key
 
 myTerminal :: [Char]
-myTerminal = "st"   -- Sets default terminal
+myTerminal = "rxvt-unicode"   -- Sets default terminal
 
 myBorderWidth :: Dimension
 myBorderWidth = 2          -- Sets border width for windows
@@ -300,13 +300,15 @@ myManageHook = composeAll
      -- I'm doing it this way because otherwise I would have to write out 
      -- the full name of my clickable workspaces, which would look like:
      -- doShift "<action xdotool super+8>gfx</action>"
-     [ className =? "obs"     --> doShift ( myWorkspaces !! 5)
-     , className =? "firefox"     --> doShift ( myWorkspaces !! 1)
-     , className =? "vlc"     --> doShift ( myWorkspaces !! 4)
-     , className =? "Gimp"    --> doShift ( myWorkspaces !! 6)
-     , title =? "Oracle VM VirtualBox Manager"     --> doFloat
-     , className =? "Oracle VM VirtualBox Manager" --> doShift  ( myWorkspaces !! 6)
-     , (className =? "firefox" <&&> resource =? "Dialog") --> doFloat  -- Float Firefox Dialog
+     [ className =? "obs"           --> doShift ( myWorkspaces !! 5)
+     , className =? "Firefox-esr"   --> doShift ( myWorkspaces !! 1)
+     , className =? "vlc"           --> doShift ( myWorkspaces !! 4)
+     , className =? "Gimp"          --> doShift ( myWorkspaces !! 6)
+     , className =? "Code"          --> doShift ( myWorkspaces !! 0)
+     , className =? "Pavucontrol"   --> doFloat
+     -- , title =? "Oracle VM VirtualBox Manager"     --> doFloat
+     -- , className =? "Oracle VM VirtualBox Manager" --> doShift  ( myWorkspaces !! 6)
+     -- , (className =? "Firefox-esr" <&&> resource =? "Dialog") --> doFloat  -- Float Firefox Dialog
      ]
 
 

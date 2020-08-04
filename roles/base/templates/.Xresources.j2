@@ -1,0 +1,71 @@
+URxvt*imLocale: en_US.UTF-8
+URxvt*termName: rxvt-unicode-256color
+URxvt*buffered: false
+URxvt.intensityStyles: false
+URxvt.font: xft:Mononoki Nerd Font:size=14, \
+            xft:JoyPixels:size=14, \
+            xft:Monospace:style=Medium:size=14   
+URxvt.saveLines: 2000
+URxvt.scrollBar: false
+URxvt.cursorColor: white
+
+!! Extensions
+URxvt.perl-ext-common: default,matcher,resize-font,url-select,keyboard-select,clipboard
+URxvt.colorUL: #4682B4
+!! url-select
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-select.launcher: urxvt -e lynx -cfg=~/.lynx.cfg -lss=~/.lynx.lss
+URxvt.url-select.underline: true
+!! keyboard-select:
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
+!! resize-font
+URxvt.keysym.C-k:   font-size:increase
+URxvt.keysym.C-j:   font-size:decrease
+!! Matcher
+URxvt.url-launcher:	urxvt -e lynx -cfg=~/.lynx.cfg -lss=~/.lynx.lss
+URxvt.matcher.button: 1
+!!clipboard
+URxvt.keysym.M-c: perl:clipboard:copy
+URxvt.keysym.M-v: perl:clipboard:paste
+URxvt*depth: 32
+
+
+! Dracula Xresources palette
+!! COLORS
+
+! special
+URxvt*foreground:   #bbc5ff
+URxvt*background:   [95]#282a36
+URxvt*cursorColor:  #bbc5ff
+
+! black
+*.color0:       #101010  !! originally #292d3e
+*.color8:       #434758
+
+! red
+*.color1:       #f07178
+*.color9:       #ff8b92
+
+! green
+*.color2:       #c3e88d
+*.color10:      #ddffa7
+
+! yellow
+*.color3:       #ffcb6b
+*.color11:      #ffe585
+
+! blue
+*.color4:       #82aaff
+*.color12:      #9cc4ff
+
+! magenta
+*.color5:       #c792ea
+*.color13:      #e1acff
+
+! cyan
+*.color6:       #89ddff
+*.color14:      #a3f7ff
+
+! white
+*.color7:       #d0d0d0
+*.color15:      #ffffff
