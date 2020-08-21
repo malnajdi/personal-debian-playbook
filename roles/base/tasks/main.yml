@@ -124,8 +124,11 @@
     group: "{{ group }}"
     mode: 0644
 
-- name: Configure polkit user mount policy
+- name: Configure polkit policies
   template:
-    src: allow-mount-policy.pkla.j2
-    dest: /etc/polkit-1/localauthority/50-local.d/allow-mount-policy.pkla
+    src: "{{ item }}.j2"
+    dest: "/etc/polkit-1/localauthority/50-local.d/{{ item }}"
+  loop:
+    - allow-virt-manager-policy.pkla
+    - allow-mount-policy.pkla
   notify: restart polkit

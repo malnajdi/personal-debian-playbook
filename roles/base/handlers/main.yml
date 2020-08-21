@@ -21,7 +21,9 @@
   command: "fc-cache -f"
  
 - name: restart polkit
-  command: service polkit restart
+  service:
+    name: polkit
+    state: restarted
 
 - name: reload xresources
   command: "xrdb /home/malnajdi/.Xresources"
