@@ -41,6 +41,36 @@
     group: "{{ group }}"
   notify: restart compton
 
+# Suckless Terminal
+# TODO package should be downloaded and extracted and built
+# File should be exists in this role.
+- name: Check if suckless terminal (st) is installed 
+  stat:
+    path: /usr/local/bin/st
+  register: st_installed
+
+- name: Extract suckless terminal (st)
+  unarchive:
+    src: st-0.8.2.tar.gz
+    dest: "{{ user_config_path }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+  when: not st_installed.stat.exists
+
+- name: Configure suckless terminal (st)
+  template:
+    src: st_config.h.j2
+    dest: "{{ user_config_path }}/st-0.8.2/config.h"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+  register: st_configured
+
+- name: Build Suckless terminal (st)
+  command: make clean install
+  args: 
+    chdir: "{{ user_config_path }}/st-0.8.2/"
+  when: st_configured.changed
+
 # Xmonad
 - name: Configure xmonad
   template:
