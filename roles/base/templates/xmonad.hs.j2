@@ -107,7 +107,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          spawnOnce "xrandr --output DP-3 --off --output DVI-I-0 --off --output HDMI-0 --primary --mode 1920x1080 --pos 1080x360 --rotate normal --output DP-5 --off --output DP-4 --mode 1920x1080 --pos 3000x360 --rotate normal --output DVI-I-1 --off --output DP-2 --off --output DP-1 --off --output DP-0 --mode 1920x1080 --pos 0x0 --rotate left &"
+          spawnOnce "xrandr --output HDMI-0 --mode 1920x1080 --pos 1080x360 --rotate normal --right-of DP-4 --output DP-4 --primary --mode 1920x1080 --pos 3000x360 --rotate normal --output DP-0 --mode 1920x1080 --pos 0x0 --rotate normal --left-of DP-4 &"
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
 
@@ -292,6 +292,8 @@ myWorkspaces = clickable . (map xmobarEscape)
 -- Forcing programs to a certain workspace with a doShift requires xdotool
 -- if you are using clickable workspaces. You need the className or title 
 -- of the program. Use xprop to get this info.
+--
+-- Usage use xprop
 
 myManageHook :: XMonad.Query (Data.Monoid.Endo WindowSet)
 myManageHook = composeAll
@@ -305,6 +307,7 @@ myManageHook = composeAll
      , className =? "Gimp"          --> doShift ( myWorkspaces !! 6)
      , className =? "Code"          --> doShift ( myWorkspaces !! 0)
      , className =? "Pavucontrol"   --> doFloat
+     , className =? "Soffice"       --> doFloat
      -- , title =? "Oracle VM VirtualBox Manager"     --> doFloat
      -- , className =? "Oracle VM VirtualBox Manager" --> doShift  ( myWorkspaces !! 6)
      -- , (className =? "Firefox-esr" <&&> resource =? "Dialog") --> doFloat  -- Float Firefox Dialog
