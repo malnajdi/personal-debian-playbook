@@ -45,8 +45,8 @@ essential_packages:
   - mediainfo
   - pavucontrol
   - kdenlive
+  - libxrandr-dev
   - arandr
-  - xrandr
 
 snap_packages:
   - name: code
