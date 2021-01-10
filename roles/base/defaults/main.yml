@@ -21,6 +21,7 @@ essential_packages:
   - xmobar
   - ansible
   - mercurial
+  - tortoisehg
   - git
   - rsync
   - surf
@@ -44,14 +45,18 @@ essential_packages:
   - mediainfo
   - pavucontrol
   - kdenlive
+  - arandr
+  - xrandr
 
 snap_packages:
   - name: code
     classic: yes
+  - name: bluemail
+    classic: no
 
 # The name of the default wallpaper to be used
 # Name is the exact name in the files/wallpaper folder.
-default_user_wallpaper_name: "5"
+default_user_wallpaper_name: "9"
 
 # Compton
 compton_opacity_apps:

@@ -81,6 +81,9 @@ import XMonad.Util.SpawnOnce
 myFont :: [Char]
 myFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=12"
 
+myGridFont :: [Char]
+myGridFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=8"
+
 myModMask :: KeyMask
 myModMask = mod4Mask       -- Sets modkey to super/windows key
 
@@ -88,7 +91,7 @@ myTerminal :: [Char]
 myTerminal = "st"   -- Sets default terminal
 
 myBorderWidth :: Dimension
-myBorderWidth = 2          -- Sets border width for windows
+myBorderWidth = 4          -- Sets border width for windows
 
 myNormColor :: [Char]
 myNormColor   = "#292d3e"  -- Border color of normal windows
@@ -126,12 +129,12 @@ myColorizer = colorRangeFromClassName
                   
 -- gridSelect menu layout
 mygridConfig colorizer = (buildDefaultGSConfig myColorizer)
-    { gs_cellheight   = 30
-    , gs_cellwidth    = 200
+    { gs_cellheight   = 50
+    , gs_cellwidth    = 300
     , gs_cellpadding  = 8
     , gs_originFractX = 0.5
     , gs_originFractY = 0.5
-    , gs_font         = myFont
+    , gs_font         = myGridFont
     }
     
 spawnSelected' :: [(String, String)] -> X ()
@@ -148,6 +151,8 @@ myAppGrid = [ ("Nitrogen", "nitrogen")
             , ("Video Editor", "kdenlive")
             , ("Audio Control", "pavucontrol")
             , ("VSCode", "snap run code")
+            , ("Bluemail", "snap run bluemail")
+            , ("Hg Workbench", "thg")
             , ("LibreOffice Impress", "loimpress")
             , ("LibreOffice Writer", "lowriter")
             , ("OBS", "obs")
@@ -307,10 +312,6 @@ myManageHook = composeAll
      , className =? "Gimp"          --> doShift ( myWorkspaces !! 6)
      , className =? "Code"          --> doShift ( myWorkspaces !! 0)
      , className =? "Pavucontrol"   --> doFloat
-     , className =? "Soffice"       --> doFloat
-     -- , title =? "Oracle VM VirtualBox Manager"     --> doFloat
-     -- , className =? "Oracle VM VirtualBox Manager" --> doShift  ( myWorkspaces !! 6)
-     -- , (className =? "Firefox-esr" <&&> resource =? "Dialog") --> doFloat  -- Float Firefox Dialog
      ]
 
 
