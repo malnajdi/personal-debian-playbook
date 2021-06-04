@@ -1,5 +1,4 @@
 ---
-# tasks file for base
 - name: APT - set sources
   template:
     src: "{{ item.src }}.j2"
@@ -162,3 +161,13 @@
     - allow-virt-manager-policy.pkla
     - allow-mount-policy.pkla
   notify: restart polkit
+
+# sysctl
+# Used by reactjs watcher
+- name: Configure sysctl
+  template: 
+    src: sysctl.conf.j2
+    dest: etc/sysctl.conf
+    owner: root
+    group: root
+    mode: 0644
