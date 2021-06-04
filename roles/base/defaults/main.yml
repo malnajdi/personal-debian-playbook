@@ -47,6 +47,8 @@ essential_packages:
   - xmobar
   - xmonad
   - zsh
+  - libreoffice
+  - libx265-dev
 
 snap_packages:
   - name: code
