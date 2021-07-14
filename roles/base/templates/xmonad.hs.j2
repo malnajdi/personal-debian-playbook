@@ -110,10 +110,9 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          spawnOnce "xrandr --output HDMI-0 --mode 1920x1080 --pos 1080x360 --rotate normal --right-of DP-4 --output DP-4 --primary --mode 1920x1080 --pos 3000x360 --rotate normal --output DP-0 --mode 1920x1080 --pos 0x0 --rotate normal --left-of DP-4 &"
+          spawnOnce "xrandr --output DP-3 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-1 --mode 1920x1080 --pos 1920x0 --rotate normal --output DVI-I-1 --off --output DP-2 --off --output DP-1 --off &"
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
-
 
 ------------------------------------------------------------------------
 ---GRID SELECT

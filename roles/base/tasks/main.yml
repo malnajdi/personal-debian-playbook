@@ -167,7 +167,7 @@
 - name: Configure sysctl
   template: 
     src: sysctl.conf.j2
-    dest: etc/sysctl.conf
+    dest: /etc/sysctl.conf
     owner: root
     group: root
     mode: 0644
