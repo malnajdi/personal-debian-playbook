@@ -135,6 +135,7 @@
     dest: "{{ user_config_path }}/i3lock/lock_multi_screen.sh"
     owner: "{{ user }}"
     group: "{{ group }}"
+    mode: 0744
   
 # Language
 - name: Create change language script
