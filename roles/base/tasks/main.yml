@@ -80,12 +80,15 @@
   notify: restart xmonad
 
 # Xmobar
-- name: Configure xmobar
+- name: Configure xmobars
   template:
-    src: xmobarrc.j2
-    dest: "{{ user_config_path }}/xmobar/xmobarrc"
+    src: "{{ item }}.j2"
+    dest: "{{ user_config_path }}/xmobar/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
+  loop:
+    - xmobarrc0
+    - xmobarrc1
   notify: restart xmonad
 
 # .Xresources
