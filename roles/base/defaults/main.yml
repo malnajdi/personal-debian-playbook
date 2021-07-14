@@ -49,6 +49,10 @@ essential_packages:
   - zsh
   - libreoffice
   - libx265-dev
+  - qemu-system 
+  - libvirt-clients
+  - libvirt-daemon-system
+  - virt-manager
 
 snap_packages:
   - name: code
