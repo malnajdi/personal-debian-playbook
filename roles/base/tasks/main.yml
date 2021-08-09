@@ -109,7 +109,7 @@
     group: root
   loop: "{{ q('fileglob', 'files/fonts/*.ttf') }}"
   notify: update font cache
-  
+
 # Nitrogen & wallpapers
 - name: Copy wallpapers
   synchronize:
@@ -180,4 +180,12 @@
     name: "{{ user }}"
     group: libvirt
     append: yes
-    
+  
+# .files
+- name: Configure VSCode
+  template:
+    src: vscode.json.j2
+    dest: "/home/{{ user }}/.config/Code/User/settings.json"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
