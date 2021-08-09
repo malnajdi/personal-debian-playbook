@@ -9,6 +9,9 @@ essential_packages:
   - compton
   - exa
   - fonts-font-awesome
+  - fonts-noto
+  - fonts-noto-color-emoji
+  - ibus-table-emoji
   - geany
   - gimp
   - git
