@@ -2,6 +2,7 @@
 user: malnajdi
 group: malnajdi
 essential_packages:
+  - firefox-esr
   - ansible
   - aptitude
   - arandr
