@@ -178,7 +178,8 @@
 - name: Add default user to virt-manager group
   user:
     name: "{{ user }}"
-    group: libvirt
+    groups: 
+      -  libvirt
     append: yes
   
 # .files

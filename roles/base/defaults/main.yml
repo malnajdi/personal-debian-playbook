@@ -58,6 +58,7 @@ essential_packages:
   - libvirt-clients
   - libvirt-daemon-system
   - virt-manager
+  - vagrant-libvirt
 
 snap_packages:
   - name: code
