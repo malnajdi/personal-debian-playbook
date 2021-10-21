@@ -185,8 +185,11 @@
 # .files
 - name: Configure VSCode
   template:
-    src: vscode.json.j2
-    dest: "/home/{{ user }}/.config/Code/User/settings.json"
+    src: "{{ item }}.j2"
+    dest: "/home/{{ user }}/.config/Code/User/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
+  loop:
+    - vscode.json
+    - keybindings.json

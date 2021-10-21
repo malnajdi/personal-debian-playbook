@@ -59,6 +59,7 @@ essential_packages:
   - libvirt-daemon-system
   - virt-manager
   - vagrant-libvirt
+  - openfortivpn
 
 snap_packages:
   - name: code

@@ -110,7 +110,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          spawnOnce "xrandr --output DP-2 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-0 --mode 1920x1080 --pos 1920x0 --rotate left --output DP-0 --primary --mode 1920x1080 --pos 0x1080 --rotate normal &"
+          spawnOnce "xrandr --output DVI-I-0 --off --output DVI-I-1 --off --output HDMI-0 --mode 1920x1080 --pos 3000x0 --rotate left --output DP-0 --primary --mode 1920x1080 --pos 0x420 --rotate normal --output DP-1 --off --output DP-2 --mode 1920x1080 --pos 1920x0 --rotate left --output DP-3 --off --output DP-4 --off --output DP-5 --off &"
           spawnOnce "nitrogen --restore &" 
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
 
@@ -165,8 +165,8 @@ myAppGrid = [ ("Nitrogen", "nitrogen")
 myKeys :: [([Char], X ())]
 myKeys =
     --- Xmonad
-        [ ("M-C-r", spawn "xmonad --recompile")      -- Recompiles xmonad
-        , ("M-S-r", spawn "xmonad --restart")        -- Restarts xmonad
+        [ ("M-C-r", spawn "xmonad --recompile && nitrogen --restore")      -- Recompiles xmonad
+        , ("M-S-r", spawn "xmonad --restart && nitrogen --restore")        -- Restarts xmonad
         , ("M-S-q", io exitSuccess)                  -- Quits xmonad
         , ("M-S-l", spawn "/home/malnajdi/.config/i3lock/lock_multi_screen.sh")        -- lock screen
     
