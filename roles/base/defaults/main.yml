@@ -60,6 +60,9 @@ essential_packages:
   - virt-manager
   - vagrant-libvirt
   - openfortivpn
+  - ansible-lint
+  - inkscape
+  - audacity
 
 snap_packages:
   - name: code
@@ -69,7 +72,7 @@ snap_packages:
 
 # The name of the default wallpaper to be used
 # Name is the exact name in the files/wallpaper folder.
-default_user_wallpaper_name: "11"
+default_user_wallpaper_name: "12"
 
 # Compton
 compton_opacity_apps:
@@ -77,3 +80,5 @@ compton_opacity_apps:
     opacity: 90
   - name: code
     opacity: 90
+  - name: steam
+    opacity: 100

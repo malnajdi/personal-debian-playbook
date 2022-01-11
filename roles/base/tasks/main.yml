@@ -193,3 +193,7 @@
   loop:
     - vscode.json
     - keybindings.json
+
+# PIP
+- name: Install ansible required testing packages
+  command: "python3 -m pip install --user 'molecule[docker,lint]'"
