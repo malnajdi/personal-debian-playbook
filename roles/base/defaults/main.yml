@@ -63,6 +63,7 @@ essential_packages:
   - ansible-lint
   - inkscape
   - audacity
+  - everdo
 
 snap_packages:
   - name: code
