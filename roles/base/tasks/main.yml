@@ -1,16 +1,16 @@
 ---
-- name: APT - set sources
-  template:
-    src: "{{ item.src }}.j2"
-    dest: "/etc/apt/{{ item.dest }}"
-  loop:
-    - {'src': 'sources.list', 'dest': 'sources.list'}
-    - {'src': 'backports.list', 'dest': 'sources.list.d/backports.list'}
-  register: apt_debian_sources
+# - name: APT - set sources
+#  template:
+#    src: "{{ item.src }}.j2"
+#    dest: "/etc/apt/{{ item.dest }}"
+#  loop:
+#    - {'src': 'sources.list', 'dest': 'sources.list'}
+#    - {'src': 'backports.list', 'dest': 'sources.list.d/backports.list'}
+# #  register: apt_debian_sources
 
-- name: APT - update debian sources
-  apt: update_cache=yes
-  when: apt_debian_sources.changed
+# - name: APT - update debian sources
+#  apt: update_cache=yes
+#  when: apt_debian_sources.changed
 
 - name: APT - install essential packages
   apt:
@@ -195,5 +195,6 @@
     - keybindings.json
 
 # PIP
-- name: Install ansible required testing packages
-  command: "python3 -m pip install --user 'molecule[docker,lint]'"
+# - name: Install ansible required testing packages
+#   pip: 
+#     name: molecule[docker,lint]

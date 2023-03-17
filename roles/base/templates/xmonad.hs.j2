@@ -30,7 +30,7 @@ import qualified Data.Map as M
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
 import XMonad.Hooks.FadeInactive
-import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
+import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
 import XMonad.Hooks.ServerMode
 import XMonad.Hooks.SetWMName
@@ -78,25 +78,25 @@ import XMonad.Util.SpawnOnce
 ------------------------------------------------------------------------
 -- VARIABLES
 ------------------------------------------------------------------------
-myFont :: [Char]
+myFont :: String
 myFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=12"
 
-myGridFont :: [Char]
+myGridFont :: String
 myGridFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=8"
 
 myModMask :: KeyMask
 myModMask = mod4Mask       -- Sets modkey to super/windows key
 
-myTerminal :: [Char]
+myTerminal :: String
 myTerminal = "st"   -- Sets default terminal
 
 myBorderWidth :: Dimension
 myBorderWidth = 4          -- Sets border width for windows
 
-myNormColor :: [Char]
+myNormColor :: String
 myNormColor   = "#292d3e"  -- Border color of normal windows
 
-myFocusColor :: [Char]
+myFocusColor :: String
 myFocusColor  = "#bbc5ff"  -- Border color of focused windows
 
 altMask :: KeyMask
@@ -138,10 +138,10 @@ mygridConfig colorizer = (buildDefaultGSConfig myColorizer)
     
 spawnSelected' :: [(String, String)] -> X ()
 spawnSelected' lst = gridselect conf lst >>= flip whenJust spawn
-    where conf = defaultGSConfig
+    where conf = def
 
 -- Set favorite apps for the spawnSelected'
-myAppGrid :: [([Char], [Char])]
+myAppGrid :: [(String, String)]
 myAppGrid = [ ("Nitrogen", "nitrogen")
             , ("Firefox", "firefox")
             , ("Geany", "geany")
@@ -164,7 +164,7 @@ myAppGrid = [ ("Nitrogen", "nitrogen")
 ------------------------------------------------------------------------
 ---KEYBINDINGS
 ------------------------------------------------------------------------
-myKeys :: [([Char], X ())]
+myKeys :: [(String, X ())]
 myKeys =
     --- Xmonad
         [ ("M-C-r", spawn "xmonad --recompile && nitrogen --restore")      -- Recompiles xmonad
@@ -258,14 +258,6 @@ myKeys =
     --- Open Terminal
         , ("M-<Return>", spawn myTerminal)
 
-    --- Dmenu Scripts (Alt+Ctr+Key)
-        , ("M1-C-<Return>", spawn "dmenu_run -fn 'UbuntuMono Nerd Font:size=10' -nb '#292d3e' -nf '#bbc5ff' -sb '#82AAFF' -sf '#292d3e' -p 'dmenu:'")
-        , ("M1-C-e", spawn "./.dmenu/dmenu-edit-configs.sh")
-        , ("M1-C-h", spawn "./.dmenu/dmenu-hugo.sh")
-        , ("M1-C-m", spawn "./.dmenu/dmenu-sysmon.sh")
-        , ("M1-C-p", spawn "passmenu")
-        , ("M1-C-s", spawn "./.dmenu/dmenu-surfraw.sh")
-
     --- My Applications (Super+Alt+Key)
         --, ("M-M1-a", spawn (myTerminal ++ " -e ncpamixer"))
 
@@ -276,7 +268,7 @@ myKeys =
 ---WORKSPACES
 ------------------------------------------------------------------------
 
-xmobarEscape :: [Char] -> [Char]
+xmobarEscape :: String -> String
 xmobarEscape = concatMap doubleLts
   where
         doubleLts '<' = "<<"
@@ -377,7 +369,7 @@ myLayoutHook = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts float
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 /home/malnajdi/.config/xmobar/xmobarrc0"
-    xmproc1 <- spawnPipe "xmobar -x 2 /home/malnajdi/.config/xmobar/xmobarrc1"
+    xmproc1 <- spawnPipe "xmobar -x 1 /home/malnajdi/.config/xmobar/xmobarrc1"
     -- the xmonad, ya know...what the WM is named after!
     xmonad $ ewmh def
         { manageHook = ( isFullscreen --> doFullFloat ) <+> myManageHook <+> manageDocks
@@ -385,10 +377,6 @@ main = do
         -- shrink, expand, next-layout, default-layout, restart-wm, xterm, kill, refresh, run,
         -- focus-up, focus-down, swap-up, swap-down, swap-master, sink, quit-wm. You can run 
         -- "xmonadctl 0" to generate full list of commands written to ~/.xsession-errors.
-        , handleEventHook    = serverModeEventHookCmd 
-                               <+> serverModeEventHook 
-                               <+> serverModeEventHookF "XMONAD_PRINT" (io . putStrLn)
-                               <+> docksEventHook
         , modMask            = myModMask
         , terminal           = myTerminal
         , startupHook        = myStartupHook
