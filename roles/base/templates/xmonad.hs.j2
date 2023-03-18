@@ -110,8 +110,8 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          spawnOnce "xrandr --output DVI-I-0 --off --output DVI-I-1 --off --output HDMI-0 --mode 1920x1080 --pos 0x1080 --rotate normal --output DP-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --mode 1920x1080 --pos 1920x0 --rotate left --output DP-3 --off --output DP-4 --off --output DP-5 --off"
-          spawnOnce "nitrogen --restore &" 
+          spawnOnce "xrandr --output HDMI-0 --off --output DP-0 --off --output DP-1 --off --output HDMI-1 --off --output DP-2 --primary --mode 2560x1440 --pos 0x0 --rotate normal --output DP-3 --off --output DP-4 --mode 1920x1080 --pos 2560x224 --rotate normal --output DP-5 --off"
+          spawnOnce "nitrogen --restore &"
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
 
 ------------------------------------------------------------------------
@@ -125,7 +125,7 @@ myColorizer = colorRangeFromClassName
                   (0x61,0x57,0x72) -- active bg
                   (0xc0,0xa7,0x9a) -- inactive fg
                   (0xff,0xff,0xff) -- active fg
-                  
+
 -- gridSelect menu layout
 mygridConfig colorizer = (buildDefaultGSConfig myColorizer)
     { gs_cellheight   = 50
@@ -135,7 +135,7 @@ mygridConfig colorizer = (buildDefaultGSConfig myColorizer)
     , gs_originFractY = 0.5
     , gs_font         = myGridFont
     }
-    
+
 spawnSelected' :: [(String, String)] -> X ()
 spawnSelected' lst = gridselect conf lst >>= flip whenJust spawn
     where conf = def
@@ -171,7 +171,7 @@ myKeys =
         , ("M-S-r", spawn "xmonad --restart && nitrogen --restore")        -- Restarts xmonad
         , ("M-S-q", io exitSuccess)                  -- Quits xmonad
         , ("M-S-l", spawn "/home/malnajdi/.config/i3lock/lock_multi_screen.sh")        -- lock screen
-    
+
     --- Windows
         , ("M-S-c", kill1)                           -- Kill the currently focused client
         , ("M-S-a", killAll)                         -- Kill all the windows on current workspace
@@ -187,7 +187,7 @@ myKeys =
         , ("M-S-g", goToSelected $ mygridConfig myColorizer)  -- goto selected
         , ("M-S-b", bringSelected $ mygridConfig myColorizer) -- bring selected
 
-    --- Keyboard Language 
+    --- Keyboard Language
         , ("M1-S-1", spawn "sh /home/malnajdi/.config/change-lang.sh")
 
     -- Windows navigation
@@ -200,9 +200,9 @@ myKeys =
         , ("M-<Backspace>", promote)         -- Moves focused window to master, others maintain order
         , ("M1-S-<Tab>", rotSlavesDown)      -- Rotate all windows except master and keep focus in place
         , ("M1-C-<Tab>", rotAllDown)         -- Rotate all the windows in the current stack
-        --, ("M-S-s", windows copyToAll)  
-        , ("M-C-s", killAllOtherCopies) 
-        
+        --, ("M-S-s", windows copyToAll)
+        , ("M-C-s", killAllOtherCopies)
+
         , ("M-C-M1-<Up>", sendMessage Arrange)
         , ("M-C-M1-<Down>", sendMessage DeArrange)
         , ("M-<Up>", sendMessage (MoveUp 10))             --  Move focused window to up
@@ -218,7 +218,7 @@ myKeys =
         , ("M-C-<Right>", sendMessage (DecreaseRight 10)) --  Decrease size of focused window right
         , ("M-C-<Left>", sendMessage (DecreaseLeft 10))   --  Decrease size of focused window left
 
-        
+
         , ("M-C-M1-<Up>", sendMessage Arrange)
         , ("M-C-M1-<Down>", sendMessage DeArrange)
         , ("M-<Up>", sendMessage (MoveUp 10))             --  Move focused window to up
@@ -271,7 +271,7 @@ myKeys =
 
         ] where nonNSP          = WSIs (return (\ws -> W.tag ws /= "nsp"))
                 nonEmptyNonNSP  = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "nsp"))
-                
+
 ------------------------------------------------------------------------
 ---WORKSPACES
 ------------------------------------------------------------------------
@@ -281,14 +281,14 @@ xmobarEscape = concatMap doubleLts
   where
         doubleLts '<' = "<<"
         doubleLts x   = [x]
-        
-myWorkspaces :: [String]   
-myWorkspaces = clickable . (map xmobarEscape) 
+
+myWorkspaces :: [String]
+myWorkspaces = clickable . (map xmobarEscape)
                $ ["dev", "www", "sys", "repo", "ent", "rec", "draw"]
-  where                                                                      
+  where
         clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
-                      (i,ws) <- zip [1..9] l,                                        
-                      let n = i ] 
+                      (i,ws) <- zip [1..9] l,
+                      let n = i ]
 
 ------------------------------------------------------------------------
 -- MANAGEHOOK
@@ -296,7 +296,7 @@ myWorkspaces = clickable . (map xmobarEscape)
 -- Sets some rules for certain programs. Examples include forcing certain
 -- programs to always float, or to always appear on a certain workspace.
 -- Forcing programs to a certain workspace with a doShift requires xdotool
--- if you are using clickable workspaces. You need the className or title 
+-- if you are using clickable workspaces. You need the className or title
 -- of the program. Use xprop to get this info.
 --
 -- Usage use xprop
@@ -304,7 +304,7 @@ myWorkspaces = clickable . (map xmobarEscape)
 myManageHook :: XMonad.Query (Data.Monoid.Endo WindowSet)
 myManageHook = composeAll
      -- using 'doShift ( myWorkspaces !! 7)' sends program to workspace 8!
-     -- I'm doing it this way because otherwise I would have to write out 
+     -- I'm doing it this way because otherwise I would have to write out
      -- the full name of my clickable workspaces, which would look like:
      -- doShift "<action xdotool super+8>gfx</action>"
      [ className =? "obs"           --> doShift ( myWorkspaces !! 5)
@@ -358,7 +358,7 @@ tabs     = renamed [Replace "tabs"]
                       , activeTextColor     = "#ffffff"
                       , inactiveTextColor   = "#d0d0d0"
                       }
-          
+
 -- The layout hook
 myLayoutHook = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts floats $
                mkToggle (NBFULL ?? NOBORDERS ?? EOT) $ myDefaultLayout
@@ -369,7 +369,7 @@ myLayoutHook = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts float
                                  ||| floats
                                  ||| grid
                                  ||| noBorders tabs
-                                 
+
 ------------------------------------------------------------------------
 -- Main
 ------------------------------------------------------------------------
@@ -383,12 +383,12 @@ main = do
         { manageHook = ( isFullscreen --> doFullFloat ) <+> myManageHook <+> manageDocks
         -- Run xmonad commands from command line with "xmonadctl command". Commands include:
         -- shrink, expand, next-layout, default-layout, restart-wm, xterm, kill, refresh, run,
-        -- focus-up, focus-down, swap-up, swap-down, swap-master, sink, quit-wm. You can run 
+        -- focus-up, focus-down, swap-up, swap-down, swap-master, sink, quit-wm. You can run
         -- "xmonadctl 0" to generate full list of commands written to ~/.xsession-errors.
         , modMask            = myModMask
         , terminal           = myTerminal
         , startupHook        = myStartupHook
-        , layoutHook         = myLayoutHook 
+        , layoutHook         = myLayoutHook
         , workspaces         = myWorkspaces
         , borderWidth        = myBorderWidth
         , normalBorderColor  = myNormColor
