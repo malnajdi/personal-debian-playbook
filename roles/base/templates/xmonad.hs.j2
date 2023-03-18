@@ -79,10 +79,10 @@ import XMonad.Util.SpawnOnce
 -- VARIABLES
 ------------------------------------------------------------------------
 myFont :: String
-myFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=12"
+myFont = "xft:DejaVu Sans Mono:style=Regular:pixelsize=12"
 
 myGridFont :: String
-myGridFont = "xft:mononoki Nerd Font Mono:style=Regular:pixelsize=8"
+myGridFont = "xft:DejaVu Sans Mono:style=Regular:pixelsize=10"
 
 myModMask :: KeyMask
 myModMask = mod4Mask       -- Sets modkey to super/windows key
@@ -379,7 +379,7 @@ main = do
     xmproc0 <- spawnPipe "xmobar -x 0 /home/malnajdi/.config/xmobar/xmobarrc0"
     xmproc1 <- spawnPipe "xmobar -x 1 /home/malnajdi/.config/xmobar/xmobarrc1"
     -- the xmonad, ya know...what the WM is named after!
-    xmonad $ ewmh def
+    xmonad $ docks . ewmh $ def
         { manageHook = ( isFullscreen --> doFullFloat ) <+> myManageHook <+> manageDocks
         -- Run xmonad commands from command line with "xmonadctl command". Commands include:
         -- shrink, expand, next-layout, default-layout, restart-wm, xterm, kill, refresh, run,

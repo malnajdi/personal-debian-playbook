@@ -2,16 +2,16 @@
 -- install xmobar with these flags: --flags="with_alsa" --flags="with_mpd" --flags="with_xft"  OR --flags="all_extensions"
 -- you can find weather location codes here: http://weather.noaa.gov/index.html
 
-Config { font = "mononoki Nerd Regular 14,FontAwesome 12"
+Config { font = "DejaVu Sans Mono 16"
        , bgColor = "#282A36"
        , fgColor = "#B45BCF"
-       , position = Top
+       , position = TopH 40
        , lowerOnStart = True
        , hideOnStart = False
        , allDesktops = True
        , persistent = True
        , iconRoot = "/home/malnajdi/.xmonad/xpm/"  -- default: "."
-       , commands = [ 
+       , commands = [
                       -- Time and date
                       Run Date "\xf133  %A | %m/%d/%Y [ %I:%M ]" "date" 50
                       -- Network up and down
