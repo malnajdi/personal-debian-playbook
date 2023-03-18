@@ -1,21 +1,39 @@
 ---
+# Configure APT
 - name: APT - set sources
   template:
-    src: "{{ item.src }}.j2"
-    dest: "/etc/apt/{{ item.dest }}"
-  loop:
-    - {'src': 'sources.list', 'dest': 'sources.list'}
-    - {'src': 'backports.list', 'dest': 'sources.list.d/backports.list'}
+   src: sources.list.j2
+   dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
   register: apt_debian_sources
+
+- name: APT - set backports sources
+  template:
+    src: backports.list.j2
+    dest: /etc/apt/sources.list.d/backports.list
+    register: apt_backports_debian_sources
+
+# Configure Arch's
+- name: Configure arch's
+  template:
+    src: arch.j2
+    dest: /var/lib/dpkg/arch
+    owner: root
+    group: root
+    mode: 0644
+  source: arch_configuration
 
 - name: APT - update debian sources
   apt: update_cache=yes
-  when: apt_debian_sources.changed
+  when: apt_debian_sources.changed or apt_backports_debian_sources or arch_configuration.changed
 
 - name: APT - install essential packages
   apt:
     name: "{{ essential_packages }}"
 
+# Install Spand packages
 - name: Snapd - install packages
   snap:
     name: "{{ item.name }}"
@@ -29,6 +47,7 @@
     state: directory
     owner: "{{ user }}"
     group: "{{ group }}"
+    recurse: yes
   loop: "{{ directories }}"
 
 # Compton
@@ -43,7 +62,7 @@
 # Suckless Terminal
 # TODO package should be downloaded and extracted and built
 # File should be exists in this role.
-- name: Check if suckless terminal (st) is installed 
+- name: Check if suckless terminal (st) is installed
   stat:
     path: /usr/local/bin/st
   register: st_installed
@@ -66,7 +85,7 @@
 
 - name: Build Suckless terminal (st)
   command: make clean install
-  args: 
+  args:
     chdir: "{{ user_config_path }}/st-0.8.2/"
   when: st_configured.changed
 
@@ -93,7 +112,7 @@
 
 # .Xresources
 - name: Configure .Xresources
-  template: 
+  template:
     src: .Xresources.j2
     dest: "{{ user_home_path }}/.Xresources"
     owner: "{{ user }}"
@@ -122,12 +141,12 @@
     dest: "{{ user_config_path }}/nitrogen/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
-  loop: 
+  loop:
     - nitrogen.cfg
     - bg-saved.cfg
   register: nitrogen_status
   notify: restore nitrogen
-  
+
 # Lock Screen (i3lock)
 - name: Configure i3lock script
   template:
@@ -136,7 +155,7 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0744
-  
+
 # Language
 - name: Create change language script
   template:
@@ -150,7 +169,7 @@
 
 # Bash Aliases
 - name: Enable bash aliases
-  template: 
+  template:
     src: .bash_aliases.j2
     dest: "{{ user_home_path }}/.bash_aliases"
     owner: "{{ user }}"
@@ -168,25 +187,28 @@
 # sysctl
 # Used by reactjs watcher
 - name: Configure sysctl
-  template: 
+  template:
     src: sysctl.conf.j2
     dest: /etc/sysctl.conf
     owner: root
     group: root
     mode: 0644
 
+# User Groups
 - name: Add default user to virt-manager group
   user:
     name: "{{ user }}"
-    groups: 
-      -  libvirt
+    state: present
+    groups:
+      - libvirt
+      - sudo
     append: yes
-  
+
 # .files
 - name: Configure VSCode
   template:
     src: "{{ item }}.j2"
-    dest: "/home/{{ user }}/.config/Code/User/{{ item }}"
+    dest: "{{ user_config_path }}/Code/User/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
@@ -194,6 +216,36 @@
     - vscode.json
     - keybindings.json
 
-# PIP
-- name: Install ansible required testing packages
-  command: "python3 -m pip install --user 'molecule[docker,lint]'"
+# Install vscode extentions
+- name: Install vscode extentions
+  cmd: 'snap run code --install-extension {{ item }}'
+  loop: "{{ vscode_extentions }}"
+  ignore_errors: yes
+
+# Nano
+- name: Get nano config
+  git:
+    repo: http://github.com/serialhex/nano-highlight.git
+    dest: '{{ user_home_path }}/.nano'
+  become: true
+  become_user: "{{ user }}"
+
+- name: Configure nano
+  template:
+    src: "nanorc.j2"
+    dest: "{{ user_config_path }}/.nanorc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+
+- name: Set nano as default editor
+  cmd: 'update-alternatives --set editor /bin/nano'
+
+# GIT
+- name: Configure nano
+  template:
+    src: ".gitconfig.j2"
+    dest: "{{ user_home_path }}/.gitconfig"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644

@@ -1,6 +1,11 @@
 ---
 user: malnajdi
 group: malnajdi
+
+apt_set_source_list: true
+apt_enable_backports: true
+enable_i386_arch: true
+
 essential_packages:
   - qbittorrent
   - firefox-esr
@@ -54,15 +59,26 @@ essential_packages:
   - zsh
   - libreoffice
   - libx265-dev
-  - qemu-system 
+  - qemu-system
   - libvirt-clients
   - libvirt-daemon-system
   - virt-manager
   - vagrant-libvirt
-  - openfortivpn
   - ansible-lint
   - inkscape
   - audacity
+  - python3-pip
+  - nvidia-driver
+  - nvidia-driver-libs:i386
+  - firmware-misc-nonfree
+  - mesa-vulkan-drivers
+  - mesa-vulkan-drivers:i386
+  - libgl1:i386
+  - libgl1-mesa-glx:i386
+  - libgl1-mesa-dri:i386
+  - libglx-mesa0:i386
+  - steam
+  - everdo
 
 snap_packages:
   - name: code
@@ -77,8 +93,14 @@ default_user_wallpaper_name: "12"
 # Compton
 compton_opacity_apps:
   - name: st
-    opacity: 90
+    opacity: 95
   - name: code
-    opacity: 90
+    opacity: 95
   - name: steam
     opacity: 100
+
+# Vscode Extentions
+vscode_extentions:
+  - EditorConfig.EditorConfig
+  - mhutchie.git-graph
+  - dbaeumer.vscode-eslint

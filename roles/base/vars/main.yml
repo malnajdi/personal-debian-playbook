@@ -9,9 +9,12 @@ directories:
   - "{{ user_config_path }}/nitrogen"
   - "{{ user_config_path }}/i3lock"
   - "{{ user_config_path }}/xmobar"
-  - "{{ user_config_path }}/Code"
   - "{{ user_config_path }}/Code/User"
   - "{{ user_home_path }}/.xmonad"
+  - "{{ user_home_path }}/projects/work"
+  - "{{ user_home_path }}/projects/web"
+  - "{{ user_home_path }}/projects/devops"
+  - "{{ user_home_path }}/projects/helping"
+  - "{{ user_home_path }}/projects/devops"
 
 xmonad_config_path: "{{ user_home_path }}/.xmonad"
-
