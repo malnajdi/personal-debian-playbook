@@ -2,8 +2,8 @@
 # Configure APT
 - name: APT - set sources
   template:
-   src: sources.list.j2
-   dest: /etc/apt/sources.list
+    src: sources.list.j2
+    dest: /etc/apt/sources.list
     owner: root
     group: root
     mode: 0644
@@ -13,17 +13,16 @@
   template:
     src: backports.list.j2
     dest: /etc/apt/sources.list.d/backports.list
-    register: apt_backports_debian_sources
+  register: apt_backports_debian_sources
 
-# Configure Arch's
-- name: Configure arch's
+- name: Configure archs
   template:
     src: arch.j2
     dest: /var/lib/dpkg/arch
     owner: root
     group: root
     mode: 0644
-  source: arch_configuration
+  register: arch_configuration
 
 - name: APT - update debian sources
   apt: update_cache=yes
@@ -218,7 +217,7 @@
 
 # Install vscode extentions
 - name: Install vscode extentions
-  cmd: 'snap run code --install-extension {{ item }}'
+  command: 'snap run code --install-extension {{ item }}'
   loop: "{{ vscode_extentions }}"
   ignore_errors: yes
 
@@ -239,7 +238,7 @@
     mode: 0644
 
 - name: Set nano as default editor
-  cmd: 'update-alternatives --set editor /bin/nano'
+  command: 'update-alternatives --set editor /bin/nano'
 
 # GIT
 - name: Configure nano
