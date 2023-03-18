@@ -208,7 +208,7 @@
 - name: Configure VSCode
   template:
     src: "{{ item }}.j2"
-    dest: "/home/{{ user }}/.config/Code/User/{{ item }}"
+    dest: "{{ user_config_path }}/Code/User/{{ item }}"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
@@ -221,3 +221,31 @@
   cmd: 'snap run code --install-extension {{ item }}'
   loop: "{{ vscode_extentions }}"
   ignore_errors: yes
+
+# Nano
+- name: Get nano config
+  git:
+    repo: http://github.com/serialhex/nano-highlight.git
+    dest: '{{ user_home_path }}/.nano'
+  become: true
+  become_user: "{{ user }}"
+
+- name: Configure nano
+  template:
+    src: "nanorc.j2"
+    dest: "{{ user_config_path }}/.nanorc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+
+- name: Set nano as default editor
+  cmd: 'update-alternatives --set editor /bin/nano'
+
+# GIT
+- name: Configure nano
+  template:
+    src: ".gitconfig.j2"
+    dest: "{{ user_home_path }}/.gitconfig"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
