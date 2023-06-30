@@ -78,6 +78,8 @@ essential_packages:
   - libgl1-mesa-dri:i386
   - libglx-mesa0:i386
   - steam
+  - ffmpegthumbnailer
+  - tumbler
   # - everdo
 
 snap_packages:
