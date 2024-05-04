@@ -14,7 +14,7 @@ selected_alias=$(alias | cut -d'=' -f1 | sed "s/alias //g" | $DMENU)
 # Execute the selected alias if not empty
 if [ -n "$selected_alias" ]; then
     # Extract the command associated with the alias
-    command_to_run=$(alias $selected_alias | sed "s/alias $selected_al>
+    command_to_run=$(alias $selected_alias | sed "s/alias $selected_alias='\(.*\)'/\1/")
     eval $command_to_run
 else
     echo "No selection made."
