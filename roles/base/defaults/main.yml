@@ -49,6 +49,7 @@ essential_packages:
   - suckless-tools
   - sudo
   - surf
+  - screenkey
   - thunar
   - tortoisehg
   - virtualenvwrapper
