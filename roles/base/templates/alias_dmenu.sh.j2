@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Define the location of dmenu (change if necessary)
+DMENU='dmenu -i'
+
+# Load aliases (ensure this matches where your aliases are defined)
+if [ -f ~/.bash_aliases ]; then
+    source ~/.bash_aliases
+fi
+
+# Extract aliases and put them into dmenu
+selected_alias=$(alias | cut -d'=' -f1 | sed "s/alias //g" | $DMENU)
+
+# Execute the selected alias if not empty
+if [ -n "$selected_alias" ]; then
+    # Extract the command associated with the alias
+    command_to_run=$(alias $selected_alias | sed "s/alias $selected_al>
+    eval $command_to_run
+else
+    echo "No selection made."
+fi
+

@@ -88,6 +88,15 @@
     chdir: "{{ user_config_path }}/st-0.8.2/"
   when: st_configured.changed
 
+# Dmenu
+- name: Configure dmenu
+  template:
+    src: alias_dmenu.sh.j2
+    dest: "{{ user_config_path }}/alias_dmenu.sh"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0766
+
 # Xmonad
 - name: Configure xmonad
   template:
