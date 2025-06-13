@@ -110,7 +110,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          spawnOnce "xrandr --output HDMI-0 --off --output DP-0 --mode 2560x1440 --pos 3000x0 --rotate normal --output DP-1 --off --output HDMI-1 --off --output DP-2 --mode 1920x1080 --pos 0x0 --rotate left --output DP-3 --off --output DP-4 --primary --mode 1920x1080 --pos 1080x0 --rotate normal --output DP-5 --off"
+          spawnOnce "sh /home/malnajdi/.screenlayout/screen.sh &"
           spawnOnce "nitrogen --restore &"
           spawnOnce "compton --config /home/malnajdi/.config/compton/compton.conf &"
 
@@ -173,6 +173,7 @@ myKeys =
         , ("M-S-r", spawn "xmonad --restart && nitrogen --restore")        -- Restarts xmonad
         , ("M-S-q", io exitSuccess)                  -- Quits xmonad
         , ("M-S-l", spawn "/home/malnajdi/.config/i3lock/lock_multi_screen.sh")        -- lock screen
+        , ("M-S-s", spawn "/home/malnajdi/.screenlayout/screen.sh")        -- screen order
 
     --- Windows
         , ("M-S-c", kill1)                           -- Kill the currently focused client
@@ -374,8 +375,8 @@ myLayoutHook = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts float
 
 main :: IO ()
 main = do
-    xmproc0 <- spawnPipe "xmobar -x 1 /home/malnajdi/.config/xmobar/xmobarrc0"
-    xmproc1 <- spawnPipe "xmobar -x 0 /home/malnajdi/.config/xmobar/xmobarrc1"
+    xmproc0 <- spawnPipe "xmobar -x 0 /home/malnajdi/.config/xmobar/xmobarrc0"
+    xmproc1 <- spawnPipe "xmobar -x 2 /home/malnajdi/.config/xmobar/xmobarrc1"
     -- the xmonad, ya know...what the WM is named after!
     xmonad $ docks . ewmh $ def
         { manageHook = ( isFullscreen --> doFullFloat ) <+> myManageHook <+> manageDocks
