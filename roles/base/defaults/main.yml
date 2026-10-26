@@ -217,13 +217,11 @@ xmonad_gap: 6
 xmonad_show_workspace_name: true
 
 # Xmobar
-# Screen 0 gets the primary bar. All other screens get the compact bar.
+# Each screen gets the same bar.
 # The "Propo" variant gives the icons their full width.
 bar_font: JetBrainsMono Nerd Font Propo
-bar_primary_height: 34
-bar_primary_font_size: 12
-bar_secondary_height: 30
-bar_secondary_font_size: 11
+bar_height: 34
+bar_font_size: 12
 # Space between the bar and the screen edges. Use 0 for a bar that touches the edges.
 # Two times the xmonad gap lines up the bar with the window edges.
 bar_margin: "{{ xmonad_gap * 2 }}"

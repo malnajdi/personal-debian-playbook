@@ -356,15 +356,12 @@ myLayoutHook = {% if xmonad_show_workspace_name %}showWName' mySWNConfig $ {% en
 ------------------------------------------------------------------------
 -- STATUS BARS
 ------------------------------------------------------------------------
--- One xmobar on each screen. Screen 0 gets the primary bar and all other
--- screens get the compact bar. Bars come and go when you add or remove a monitor.
+-- One xmobar on each screen, all with the same bar.
+-- Bars come and go when you add or remove a monitor.
 myStatusBar :: ScreenId -> IO StatusBarConfig
 myStatusBar s@(S n) = statusBarPipe command (clickablePP (myPP s))
   where
-    command = "xmobar -x " ++ show n ++ " " ++ config
-    config
-      | n == 0    = "{{ user_config_path }}/xmobar/xmobarrc"
-      | otherwise = "{{ user_config_path }}/xmobar/xmobarrc-secondary"
+    command = "xmobar -x " ++ show n ++ " {{ user_config_path }}/xmobar/xmobarrc"
 
 myPP :: ScreenId -> PP
 myPP s = def
@@ -373,28 +370,23 @@ myPP s = def
     , ppHidden          = xmobarColor colorText ""                             -- Workspaces with windows
     , ppHiddenNoWindows = xmobarColor colorSurface2 ""                         -- Empty workspaces
     , ppUrgent          = pill colorCrust colorRed                             -- Urgent workspace
-    , ppRename          = \ws _ -> workspaceLabel ws
+    , ppRename          = \ws _ -> workspaceIcon ws ++ " " ++ ws
     , ppWsSep           = " "
     , ppSep             = "  "
     , ppOrder           = \xs -> take 1 xs ++ drop 3 xs                       -- Workspaces, then the extras
     , ppExtras          = [layoutLogger s]
     }
   where
-    primary = s == 0
     -- Solid color behind the text, from the top to the bottom of the bar.
     -- A space on each side, so the text does not touch the edge of the color.
     pill fg bg = wrap ("<fc=" ++ fg ++ "," ++ bg ++ ":0>") "</fc>" . wrap " " " "
-    workspaceLabel ws
-      | primary   = workspaceIcon ws ++ " " ++ ws
-      | otherwise = workspaceIcon ws
 
 -- Layout icon and name. Click it to change the layout.
 layoutLogger :: ScreenId -> Logger
 layoutLogger s = fmap (fmap label) (logLayoutOnScreen s)
   where
     label l = xmobarAction "xdotool key super+Tab" "1"
-            $ xmobarColor colorBlue "" (layoutIcon l)
-           ++ (if s == 0 then " " ++ xmobarColor colorSubtext "" l else "")
+            $ xmobarColor colorBlue "" (layoutIcon l) ++ " " ++ xmobarColor colorSubtext "" l
 
 layoutIcon :: String -> String
 layoutIcon l = fromMaybe "\xf0db" (lookup l icons)

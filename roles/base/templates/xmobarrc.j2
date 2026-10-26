@@ -35,7 +35,7 @@
   + (['%battery%'] if has_battery | bool else [])
   + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0> <fn=1>' ~ icon.calendar ~ '</fn> %date% </fc>',
      '<action=`' ~ user_config_path ~ '/powermenu.sh`><fc=' ~ theme.red ~ '><fn=1>' ~ icon.power ~ '</fn></fc></action>'] %}
--- xmobar: primary bar (screen 0)
+-- xmobar: the bar on each screen
 -- Managed by Ansible. Edit roles/base/templates/xmobarrc.j2 instead.
 -- https://codeberg.org/xmobar/xmobar
 --
@@ -44,14 +44,14 @@
 -- Click: workspaces, layout, Wi-Fi and Bluetooth (right click: on/off), volume (scroll to change),
 --        keyboard, Debian logo and power icon
 
-Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
-       , additionalFonts = [ "{{ bar_font }} {{ bar_primary_font_size + 2 }}"    -- fn=1: icons
-                           , "{{ bar_font }} Bold {{ bar_primary_font_size }}"   -- fn=2: bold
+Config { font            = "{{ bar_font }} {{ bar_font_size }}"
+       , additionalFonts = [ "{{ bar_font }} {{ bar_font_size + 2 }}"    -- fn=1: icons
+                           , "{{ bar_font }} Bold {{ bar_font_size }}"   -- fn=2: bold
                            ]
        , bgColor         = "{{ theme.base }}"
        , fgColor         = "{{ theme.text }}"
        , alpha           = {{ bar_alpha }}
-       , position        = TopHM {{ bar_primary_height }} {{ bar_margin }} {{ bar_margin }} {{ bar_margin }} 0
+       , position        = TopHM {{ bar_height }} {{ bar_margin }} {{ bar_margin }} {{ bar_margin }} 0
        , lowerOnStart    = True
        , hideOnStart     = False
        , allDesktops     = True

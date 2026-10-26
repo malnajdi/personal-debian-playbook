@@ -122,7 +122,7 @@
     - /etc/lightdm/lightdm.conf.d
     - /usr/share/backgrounds
 
-# Remove files from the old setup (compton, two xmobar configs, polkit pkla)
+# Remove files from the old setup (compton, old xmobar configs, polkit pkla)
 - name: Remove replaced configuration files
   file:
     path: "{{ item }}"
@@ -131,6 +131,7 @@
     - "{{ user_config_path }}/compton"
     - "{{ user_config_path }}/xmobar/xmobarrc0"
     - "{{ user_config_path }}/xmobar/xmobarrc1"
+    - "{{ user_config_path }}/xmobar/xmobarrc-secondary"
     - "{{ user_config_path }}/.nanorc"
     - /etc/polkit-1/localauthority/50-local.d/allow-mount-policy.pkla
 
@@ -239,15 +240,12 @@
     file_type: any
   register: power_supply_batteries
 
-- name: Configure xmobars
+- name: Configure xmobar
   template:
-    src: "{{ item }}.j2"
-    dest: "{{ user_config_path }}/xmobar/{{ item }}"
+    src: xmobarrc.j2
+    dest: "{{ user_config_path }}/xmobar/xmobarrc"
     owner: "{{ user }}"
     group: "{{ group }}"
-  loop:
-    - xmobarrc
-    - xmobarrc-secondary
   vars:
     has_battery: "{{ power_supply_batteries.matched > 0 }}"
   notify: restart xmonad

@@ -9,7 +9,7 @@
 ### Features
 * One color palette (Catppuccin Mocha or Tokyo Night) for xmonad, xmobar, picom, rofi, dunst, st, GTK and the login screen.
 * New xmobar design: floating bar with icons, clickable workspaces and layout, CPU, memory, disk, network, volume, keyboard layout, date and a power menu.
-* One xmobar on each monitor (compact bar on the other monitors). Bars follow monitor changes.
+* One xmobar on each monitor, the same bar on all monitors. Bars follow monitor changes.
 * picom 12 configuration: rounded corners, shadows, blur, fading, dim of inactive windows and open/close animations.
 * rofi launcher (`Super + P`), command runner, alias menu and power menu (`Super + Shift + X`) with the theme.
 * dunst notifications with the theme.

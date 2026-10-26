@@ -31,7 +31,7 @@ You can run the playbook again at any time. It only changes what is different.
 | Part          | Program  | Configuration template                       |
 |---------------|----------|----------------------------------------------|
 | Window manager| xmonad   | `roles/base/templates/xmonad.hs.j2`          |
-| Bars          | xmobar   | `xmobarrc.j2` (screen 0), `xmobarrc-secondary.j2` (other screens) |
+| Bars          | xmobar   | `xmobarrc.j2`                                |
 | Compositor    | picom    | `picom.conf.j2`                              |
 | Menus         | rofi     | `rofi.rasi.j2`, `powermenu.sh.j2`, `alias_dmenu.sh.j2` |
 | Notifications | dunst    | `dunstrc.j2`                                 |
@@ -39,9 +39,8 @@ You can run the playbook again at any time. It only changes what is different.
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 
-xmonad starts one bar on each monitor. Screen 0 gets the full bar. The other
-screens get a compact bar. When you connect or disconnect a monitor, the bars
-change too.
+xmonad starts one bar on each monitor. All monitors get the same bar. When you
+connect or disconnect a monitor, the bars change too.
 
 ### Theme
 
@@ -66,7 +65,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `ui_font`                    | `JetBrainsMono Nerd Font` | Font for the terminal, menus and notifications |
 | `xmonad_gap`                 | `6`                | Gap between windows, in pixels                |
 | `xmonad_show_workspace_name` | `true`             | Show the workspace name when it changes       |
-| `bar_primary_height`         | `34`               | Height of the bar on screen 0                 |
+| `bar_height`                 | `34`               | Height of the bar                             |
 | `bar_alpha`                  | `235`              | Bar transparency (0 to 255)                   |
 | `picom_backend`              | `glx`              | Use `egl` or `xrender` if the screen does not update |
 | `picom_animations`           | `true`             | Animations when windows open and close        |
