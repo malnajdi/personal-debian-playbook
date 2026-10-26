@@ -98,8 +98,14 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `Super + Shift + R`      | Restart xmonad                            |
 
 You can also click the bar: workspaces, the layout name, the Debian logo (launcher),
-the volume (click: mixer, scroll: volume, middle click: mute), the keyboard
-layout and the power icon.
+Wi-Fi and Bluetooth (click: menu, right click: on/off), the volume (click: mixer,
+scroll: volume, middle click: mute), the keyboard layout and the power icon.
+
+Wi-Fi and Bluetooth are only in the bar when the device has the hardware. The
+playbook then installs NetworkManager (`network-manager`) and BlueZ (`bluez`).
+The Wi-Fi menu lists the networks and asks for the password of a new network.
+The Bluetooth menu connects paired devices, and scans for new devices to pair.
+When a keyboard needs a passkey to pair, a notification shows the passkey to type on it.
 
 ### Monitors
 

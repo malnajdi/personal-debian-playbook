@@ -96,6 +96,14 @@ desktop_packages:
   - libfreetype-dev
   - xz-utils
 
+# Installed only when the device has Wi-Fi or Bluetooth
+wifi_packages:
+  - network-manager
+  - rfkill
+bluetooth_packages:
+  - bluez
+  - rfkill
+
 snap_packages:
   - name: code
     classic: yes

@@ -1,0 +1,35 @@
+#!/bin/bash
+# Managed by Ansible
+# Print the Bluetooth state for xmobar (CommandReader).
+# It prints one line every 5 seconds: off, on, or on with a connected device.
+# It needs bluetoothctl (bluez).
+
+# xmobar gets the xmonad log on stdin. Do not let child commands read it.
+exec </dev/null
+# Use the English bluetoothctl output for all locales
+export LC_ALL=C.UTF-8
+
+print_bluetooth() {
+    powered=$(timeout 2 bluetoothctl show 2>/dev/null | awk '$1 == "Powered:" { print $2; exit }')
+
+    if [ "$powered" != "yes" ]; then
+        # bluetooth off icon
+        printf '<fc={{ theme.overlay }}><fn=1>󰂲</fn></fc>\n'
+        return
+    fi
+
+    # A connected device shows the connected icon (not the name of the device)
+    if timeout 2 bluetoothctl devices Connected 2>/dev/null | grep -q '^Device '; then
+        # bluetooth connected icon
+        printf '<fc={{ theme.blue }}><fn=1>󰂱</fn></fc>\n'
+    else
+        # bluetooth icon
+        printf '<fc={{ theme.blue }}><fn=1>󰂯</fn></fc>\n'
+    fi
+}
+
+while :; do
+    # Stop when xmobar stops (the write fails)
+    print_bluetooth || exit 0
+    sleep 5
+done

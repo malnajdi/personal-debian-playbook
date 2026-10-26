@@ -1,0 +1,44 @@
+#!/bin/bash
+# Managed by Ansible
+# Print the Wi-Fi state for xmobar (CommandReader).
+# It prints one line at start and one line after each change of NetworkManager.
+# It needs nmcli (network-manager).
+
+# xmobar gets the xmonad log on stdin. Do not let child commands read it.
+exec </dev/null
+# Use the English nmcli output for all locales
+export LC_ALL=C.UTF-8
+
+print_wifi() {
+    radio=$(timeout 2 nmcli radio wifi 2>/dev/null)
+    # Name of the active Wi-Fi connection. nmcli writes "\:" for a ":" in the name.
+    # Remove "<" and ">", so a network name cannot add xmobar tags.
+    name=$(timeout 2 nmcli -t -f TYPE,STATE,CONNECTION device 2>/dev/null \
+        | awk -F: '$1 == "wifi" && $2 == "connected" { sub(/^[^:]*:[^:]*:/, ""); print; exit }' \
+        | sed 's/\\:/:/g' | tr -d '<>')
+
+    if [ "$radio" != "enabled" ]; then
+        # wifi off icon
+        printf '<fc={{ theme.overlay }}><fn=1>󰖪</fn> off</fc>\n'
+    elif [ -n "$name" ]; then
+        # wifi icon
+        # Longer than 16 characters
+        [ -n "${name:16}" ] && name="${name:0:15}…"
+        printf '<fc={{ theme.accent }}><fn=1>󰖩</fn></fc> %s\n' "$name"
+    else
+        # wifi icon
+        printf '<fc={{ theme.overlay }}><fn=1>󰖩</fn> --</fc>\n'
+    fi
+}
+
+while :; do
+    # Stop when xmobar stops (the write fails)
+    print_wifi || exit 0
+    # Wait for changes. One change gives many lines, so print after 0.5 seconds without new lines.
+    # The time limit makes the loop write again, so the script stops soon after xmobar stops.
+    timeout 60 nmcli monitor 2>/dev/null | while read -r _; do
+        while read -r -t 0.5 _; do :; done
+        print_wifi || exit 0
+    done
+    sleep 1
+done

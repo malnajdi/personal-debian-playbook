@@ -1,0 +1,117 @@
+#!/bin/bash
+# Managed by Ansible
+# Wi-Fi menu with rofi: turn Wi-Fi on or off, connect to a network, or disconnect.
+# With the argument "toggle" it turns Wi-Fi on or off without the menu,
+# and with "rescan" it scans for networks before it opens the menu.
+# It needs nmcli (network-manager).
+
+# Use the English nmcli output for all locales
+export LC_ALL=C.UTF-8
+
+# rofi prints the number of the selected line (from 0)
+menu() {
+    rofi -dmenu -i -format i -p "$1" -theme-str 'window { width: 480px; }'
+}
+
+notify() {
+    notify-send -a "Wi-Fi" "$@"
+}
+
+turn_on() {
+    # rfkill is in /usr/sbin, which is not in the PATH of a normal user
+    /usr/sbin/rfkill unblock wifi
+    nmcli radio wifi on
+}
+
+if [ "$(nmcli radio wifi)" != "enabled" ]; then
+    [ "$1" = "toggle" ] || [ "$(printf '%s\n' "  Turn Wi-Fi on" | menu "Wi-Fi")" = "0" ] && turn_on
+    exit 0
+fi
+
+if [ "$1" = "toggle" ]; then
+    nmcli radio wifi off
+    exit 0
+fi
+
+# One line per network: in use, signal, security and name.
+# The network in use first, then the strongest signal. Each name only once, hidden networks not.
+# $1 is "no" for the networks of the last scan, or "yes" to scan first (1 to 2 seconds).
+list_networks() {
+    nmcli -t -e no -f IN-USE,SIGNAL,SECURITY,SSID device wifi list --rescan "$1" \
+        | sort -t: -k1,1r -k2,2nr \
+        | awk '{ ssid = $0; sub(/^([^:]*:){3}/, "", ssid) } ssid != "" && !seen[ssid]++'
+}
+
+# Open the menu at once with the last scan, and scan again in the background for the next time.
+# Without a last scan (for example just after Wi-Fi is on), wait for a scan.
+if [ "$1" = "rescan" ]; then
+    mapfile -t networks < <(list_networks yes)
+else
+    mapfile -t networks < <(list_networks no)
+    if [ -z "${networks[*]}" ]; then
+        mapfile -t networks < <(list_networks yes)
+    else
+        nmcli device wifi rescan >/dev/null 2>&1 &
+    fi
+fi
+
+labels=("  Turn Wi-Fi off" "  Scan again")
+for network in "${networks[@]}"; do
+    IFS=: read -r in_use signal security ssid <<< "$network"
+    if [ "$in_use" = "*" ]; then
+        icon=""   # check icon
+    elif [ -n "$security" ] && [ "$security" != "--" ]; then
+        icon=""    # lock icon
+    else
+        icon="󰖩"    # wifi icon
+    fi
+    labels+=("$icon  $ssid  ($signal%)")
+done
+
+choice=$(printf '%s\n' "${labels[@]}" | menu "Wi-Fi")
+# Nothing selected, or a text that is not in the list
+[ -n "$choice" ] && [ "$choice" -ge 0 ] || exit 0
+
+if [ "$choice" -eq 0 ]; then
+    nmcli radio wifi off
+    exit 0
+fi
+
+if [ "$choice" -eq 1 ]; then
+    exec "$0" rescan
+fi
+
+IFS=: read -r in_use signal security ssid <<< "${networks[choice - 2]}"
+
+if [ "$in_use" = "*" ]; then
+    device=$(nmcli -t -f DEVICE,TYPE device | awk -F: '$2 == "wifi" { print $1; exit }')
+    nmcli device disconnect "$device" >/dev/null && notify "Disconnected from $ssid"
+    exit 0
+fi
+
+# A saved network (nmcli gives the connection the name of the network)
+if nmcli -t -f NAME connection show | grep -qxF -- "$ssid"; then
+    notify "Connecting to $ssid"
+    if nmcli connection up id "$ssid" >/dev/null 2>&1; then
+        notify "Connected to $ssid"
+    else
+        notify -u critical "Could not connect to $ssid"
+    fi
+    exit 0
+fi
+
+# A new network
+if [ -n "$security" ] && [ "$security" != "--" ]; then
+    password=$(rofi -dmenu -password -p "Password" -theme-str 'window { width: 480px; } listview { lines: 0; }')
+    [ -n "$password" ] || exit 0
+    set -- password "$password"
+fi
+
+notify "Connecting to $ssid"
+if nmcli device wifi connect "$ssid" "$@" >/dev/null 2>&1; then
+    notify "Connected to $ssid"
+else
+    # Do not keep a connection with a wrong password
+    nmcli connection delete id "$ssid" >/dev/null 2>&1
+    notify -u critical "Could not connect to $ssid"
+fi

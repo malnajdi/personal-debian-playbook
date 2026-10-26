@@ -15,6 +15,7 @@
 * dunst notifications with the theme.
 * Dark GTK theme with Papirus icons, and a themed LightDM greeter that starts XMonad.
 * JetBrainsMono Nerd Font is installed from the Nerd Fonts release.
+* Wi-Fi and Bluetooth in the bar with rofi menus (connect, pair, on/off), when the device has the hardware.
 
 ### Fixes
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).

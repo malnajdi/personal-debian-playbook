@@ -27,7 +27,10 @@
   '<action=`rofi -show drun`><fc=' ~ theme.accent ~ '><fn=1>' ~ icon.debian ~ '</fn></fc></action>',
   '%UnsafeStdinReader%',
 ] %}
-{% set right = ['%cpu%', '%memory%', '%disku%', '%dynnetwork%', volume.text,
+{% set wireless = []
+  + (['<action=`' ~ user_config_path ~ '/wifi-menu.sh` button=1><action=`' ~ user_config_path ~ '/wifi-menu.sh toggle` button=3>%wifi%</action></action>'] if has_wifi | bool else [])
+  + (['<action=`' ~ user_config_path ~ '/bluetooth-menu.sh` button=1><action=`' ~ user_config_path ~ '/bluetooth-menu.sh toggle` button=3>%bluetooth%</action></action>'] if has_bluetooth | bool else []) %}
+{% set right = ['%cpu%', '%memory%', '%disku%', '%dynnetwork%'] + wireless + [volume.text,
   '<action=`sh ' ~ user_config_path ~ '/change-lang.sh`>%kbd%</action>']
   + (['%battery%'] if has_battery | bool else [])
   + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0> <fn=1>' ~ icon.calendar ~ '</fn> %date% </fc>',
@@ -37,8 +40,9 @@
 -- https://codeberg.org/xmobar/xmobar
 --
 -- Left:  Debian menu, workspaces, layout (from xmonad)
--- Right: CPU, memory, disk, network, volume, keyboard, date, power menu
--- Click: workspaces, layout, volume (scroll to change), keyboard, Debian logo and power icon
+-- Right: CPU, memory, disk, network, Wi-Fi, Bluetooth, volume, keyboard, date, power menu
+-- Click: workspaces, layout, Wi-Fi and Bluetooth (right click: on/off), volume (scroll to change),
+--        keyboard, Debian logo and power icon
 
 Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
        , additionalFonts = [ "{{ bar_font }} {{ bar_primary_font_size + 2 }}"    -- fn=1: icons
@@ -70,6 +74,15 @@ Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
                     , Run DynNetwork [ "-t", "<fc={{ theme.teal }}><fn=1>{{ icon.down }}</fn></fc> <rx> <fc={{ theme.teal }}><fn=1>{{ icon.up }}</fn></fc> <tx>"
                                      , "-S", "True"
                                      ] 20
+{% if has_wifi | bool %}
+                      -- Wi-Fi network. The script runs all the time
+                      -- and prints a new line when NetworkManager changes.
+                    , Run CommandReader "{{ user_config_path }}/xmobar/scripts/wifi.sh" "wifi"
+{% endif %}
+{% if has_bluetooth | bool %}
+                      -- Bluetooth state and the connected device
+                    , Run CommandReader "{{ user_config_path }}/xmobar/scripts/bluetooth.sh" "bluetooth"
+{% endif %}
                       -- Volume of the default output. The script runs all the time
                       -- and prints a new line when the volume changes.
                     , Run CommandReader "{{ user_config_path }}/xmobar/scripts/volume.sh" "volume"

@@ -58,6 +58,38 @@
   apt:
     name: "{{ essential_packages + desktop_packages }}"
 
+# Wi-Fi and Bluetooth: install the tools and show them in the bar only when the device has the hardware
+- name: Check for Wi-Fi and Bluetooth devices
+  shell: ls -d /sys/class/net/*/wireless /sys/class/bluetooth/hci* 2>/dev/null
+  register: wireless_devices
+  changed_when: false
+  failed_when: false
+
+- name: Set Wi-Fi and Bluetooth facts
+  set_fact:
+    has_wifi: "{{ wireless_devices.stdout_lines | select('search', '/wireless$') | list | length > 0 }}"
+    has_bluetooth: "{{ wireless_devices.stdout_lines | select('search', '^/sys/class/bluetooth/') | list | length > 0 }}"
+
+- name: APT - install Wi-Fi and Bluetooth packages
+  apt:
+    name: "{{ ((wifi_packages if has_wifi else []) + (bluetooth_packages if has_bluetooth else [])) | unique }}"
+  when: has_wifi or has_bluetooth
+
+# NetworkManager does not change the interfaces in /etc/network/interfaces (for example the wired one)
+- name: Enable NetworkManager
+  systemd:
+    name: NetworkManager
+    enabled: yes
+    state: started
+  when: has_wifi
+
+- name: Enable Bluetooth
+  systemd:
+    name: bluetooth
+    enabled: yes
+    state: started
+  when: has_bluetooth
+
 # Install Spand packages
 - name: Snapd - wait for the snap system to be ready
   command: snap wait system seed.loaded
@@ -164,9 +196,9 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0755
-  loop:
-    - alias_dmenu.sh
-    - powermenu.sh
+  loop: "{{ ['alias_dmenu.sh', 'powermenu.sh']
+    + (['wifi-menu.sh'] if has_wifi else [])
+    + (['bluetooth-menu.sh'] if has_bluetooth else []) }}"
 
 # Dunst (notifications)
 - name: Configure dunst
@@ -227,8 +259,9 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0755
-  loop:
-    - volume.sh
+  loop: "{{ ['volume.sh']
+    + (['wifi.sh'] if has_wifi else [])
+    + (['bluetooth.sh'] if has_bluetooth else []) }}"
 
 # .Xresources
 - name: Configure .Xresources
@@ -379,6 +412,7 @@
     mode: 0644
   loop:
     - 50-allow-mount.rules
+    - 50-allow-network.rules
 
 # sysctl
 # Debian 13 does not read /etc/sysctl.conf. Use /etc/sysctl.d.
@@ -398,6 +432,14 @@
       - libvirt
       - sudo
     append: yes
+
+- name: Add default user to bluetooth group
+  user:
+    name: "{{ user }}"
+    groups:
+      - bluetooth
+    append: yes
+  when: has_bluetooth
 
 # .files
 - name: Configure VSCode

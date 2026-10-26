@@ -1,0 +1,8 @@
+// Managed by Ansible
+// Let {{ user }} control Wi-Fi and save networks without a password in an active local session
+polkit.addRule(function(action, subject) {
+    if (action.id.indexOf("org.freedesktop.NetworkManager.") === 0 &&
+        subject.user === "{{ user }}" && subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});
