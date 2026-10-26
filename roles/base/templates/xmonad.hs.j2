@@ -369,21 +369,21 @@ myStatusBar s@(S n) = statusBarPipe command (clickablePP (myPP s))
 myPP :: ScreenId -> PP
 myPP s = def
     { ppCurrent         = pill colorCrust colorAccent                          -- Focused workspace
-    , ppVisible         = xmobarBorder "Bottom" colorAccent 2 . xmobarColor colorAccent "" . space  -- Workspace on an other screen
-    , ppHidden          = xmobarColor colorText "" . space                     -- Workspaces with windows
-    , ppHiddenNoWindows = xmobarColor colorSurface2 "" . space                 -- Empty workspaces
+    , ppVisible         = xmobarBorder "Bottom" colorAccent 2 . xmobarColor colorAccent ""  -- Workspace on an other screen
+    , ppHidden          = xmobarColor colorText ""                             -- Workspaces with windows
+    , ppHiddenNoWindows = xmobarColor colorSurface2 ""                         -- Empty workspaces
     , ppUrgent          = pill colorCrust colorRed                             -- Urgent workspace
     , ppRename          = \ws _ -> workspaceLabel ws
-    , ppWsSep           = ""
-    , ppSep             = "   "
+    , ppWsSep           = " "
+    , ppSep             = "  "
     , ppOrder           = \xs -> take 1 xs ++ drop 3 xs                       -- Workspaces, then the extras
-    , ppExtras          = [layoutLogger s, titleLogger s]
+    , ppExtras          = [layoutLogger s]
     }
   where
     primary = s == 0
-    space = wrap "  " "  "
-    -- Solid color behind the text, from the top to the bottom of the bar
-    pill fg bg = wrap ("<fc=" ++ fg ++ "," ++ bg ++ ":0>") "</fc>" . space
+    -- Solid color behind the text, from the top to the bottom of the bar.
+    -- A space on each side, so the text does not touch the edge of the color.
+    pill fg bg = wrap ("<fc=" ++ fg ++ "," ++ bg ++ ":0>") "</fc>" . wrap " " " "
     workspaceLabel ws
       | primary   = workspaceIcon ws ++ " " ++ ws
       | otherwise = workspaceIcon ws
@@ -406,16 +406,6 @@ layoutIcon l = fromMaybe "\xf0db" (lookup l icons)
             , ("tabs",    "\xf0c9")   -- bars
             , ("Full",    "\xf065")   -- expand
             ]
-
--- Title of the focused window on this screen. It is dim when the screen does not have focus.
--- xmobarStrip removes xmobar tags from the title, so a window title cannot add an action to the bar.
-titleLogger :: ScreenId -> Logger
-titleLogger s = do
-    focused <- gets (W.screen . W.current . windowset)
-    let color = if focused == s then colorText else colorOverlay
-    fmap (fmap (xmobarColor color "" . shorten width . xmobarStrip)) (logTitleOnScreen s)
-  where
-    width = if s == 0 then 80 else 40
 
 ------------------------------------------------------------------------
 -- Main

@@ -30,13 +30,13 @@
 {% set right = ['%cpu%', '%memory%', '%disku%', '%dynnetwork%', volume.text,
   '<action=`sh ' ~ user_config_path ~ '/change-lang.sh`>%kbd%</action>']
   + (['%battery%'] if has_battery | bool else [])
-  + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0>  <fn=1>' ~ icon.calendar ~ '</fn>  %date%  </fc>',
+  + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0> <fn=1>' ~ icon.calendar ~ '</fn> %date% </fc>',
      '<action=`' ~ user_config_path ~ '/powermenu.sh`><fc=' ~ theme.red ~ '><fn=1>' ~ icon.power ~ '</fn></fc></action>'] %}
 -- xmobar: primary bar (screen 0)
 -- Managed by Ansible. Edit roles/base/templates/xmobarrc.j2 instead.
 -- https://codeberg.org/xmobar/xmobar
 --
--- Left:  Debian menu, workspaces, layout, window title (from xmonad)
+-- Left:  Debian menu, workspaces, layout (from xmonad)
 -- Right: CPU, memory, disk, network, volume, keyboard, date, power menu
 -- Click: workspaces, layout, volume (scroll to change), keyboard, Debian logo and power icon
 
@@ -53,7 +53,7 @@ Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
        , allDesktops     = True
        , persistent      = True
        , commands = [
-                      -- Workspaces, layout and window title from xmonad.
+                      -- Workspaces and layout from xmonad.
                       -- The workspaces are 'clickable' in my configs.
                       Run UnsafeStdinReader
                       -- Cpu usage in percent
@@ -67,7 +67,7 @@ Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
                       -- Disk space free
                     , Run DiskU [ ("/", "<fc={{ theme.blue }}><fn=1>{{ icon.disk }}</fn></fc> <free>") ] [] 600
                       -- Network down and up on the active interface
-                    , Run DynNetwork [ "-t", "<fc={{ theme.teal }}><fn=1>{{ icon.down }}</fn></fc> <rx>  <fc={{ theme.teal }}><fn=1>{{ icon.up }}</fn></fc> <tx>"
+                    , Run DynNetwork [ "-t", "<fc={{ theme.teal }}><fn=1>{{ icon.down }}</fn></fc> <rx> <fc={{ theme.teal }}><fn=1>{{ icon.up }}</fn></fc> <tx>"
                                      , "-S", "True"
                                      ] 20
                       -- Volume of the default output. The script runs all the time
@@ -88,10 +88,10 @@ Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
                                   ] 50
 {% endif %}
                       -- Time and date
-                    , Run Date "%a %d %b  <fn=2>%I:%M %p</fn>" "date" 50
+                    , Run Date "%a %d %b <fn=2>%I:%M %p</fn>" "date" 50
                     ]
        , sepChar  = "%"
        , alignSep = "}{"
        -- The template must stay on one line
-       , template = "  {{ left | join('  ') }} }{ {{ right | join('    ') }}   "
+       , template = " {{ left | join(' ') }} }{ {{ right | join('  ') }} "
        }

@@ -4,7 +4,7 @@
 -- Managed by Ansible. Edit roles/base/templates/xmobarrc-secondary.j2 instead.
 -- https://codeberg.org/xmobar/xmobar
 --
--- Left:  workspaces, layout, window title of this screen (from xmonad)
+-- Left:  workspaces and layout of this screen (from xmonad)
 -- Right: time
 
 Config { font            = "{{ bar_font }} {{ bar_secondary_font_size }}"
@@ -20,7 +20,7 @@ Config { font            = "{{ bar_font }} {{ bar_secondary_font_size }}"
        , allDesktops     = True
        , persistent      = True
        , commands = [
-                      -- Workspaces, layout and window title from xmonad.
+                      -- Workspaces and layout from xmonad.
                       -- The workspaces are 'clickable' in my configs.
                       Run UnsafeStdinReader
                       -- Time
@@ -28,5 +28,5 @@ Config { font            = "{{ bar_font }} {{ bar_secondary_font_size }}"
                     ]
        , sepChar  = "%"
        , alignSep = "}{"
-       , template = " %UnsafeStdinReader% }{ <fc={{ theme.accent }}><fn=1>{{ clock }}</fn></fc>  %time%   "
+       , template = " %UnsafeStdinReader% }{ <fc={{ theme.accent }}><fn=1>{{ clock }}</fn></fc> %time% "
        }
