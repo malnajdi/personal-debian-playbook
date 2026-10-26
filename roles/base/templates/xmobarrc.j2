@@ -1,0 +1,97 @@
+{#- Nerd Font icons. xmobar does not read escape codes in the template, so Jinja writes the characters. -#}
+{% set icon = {
+  'debian':   '',
+  'cpu':      '',
+  'memory':   '\U000f035b',
+  'disk':     '',
+  'down':     '',
+  'up':       '',
+  'keyboard': '',
+  'calendar': '',
+  'power':    '',
+  'plug':     '',
+  'battery':  '',
+  'discharge': '',
+} %}
+{% set volume_actions = [
+  ('pavucontrol', 1),
+  ('wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle', 2),
+  ('wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 0.05+', 4),
+  ('wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05-', 5),
+] %}
+{% set volume = namespace(text='%volume%') %}
+{% for command, button in volume_actions %}
+{% set volume.text = '<action=`' ~ command ~ '` button=' ~ button ~ '>' ~ volume.text ~ '</action>' %}
+{% endfor %}
+{% set left = [
+  '<action=`rofi -show drun`><fc=' ~ theme.accent ~ '><fn=1>' ~ icon.debian ~ '</fn></fc></action>',
+  '%UnsafeStdinReader%',
+] %}
+{% set right = ['%cpu%', '%memory%', '%disku%', '%dynnetwork%', volume.text,
+  '<action=`sh ' ~ user_config_path ~ '/change-lang.sh`>%kbd%</action>']
+  + (['%battery%'] if has_battery | bool else [])
+  + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0>  <fn=1>' ~ icon.calendar ~ '</fn>  %date%  </fc>',
+     '<action=`' ~ user_config_path ~ '/powermenu.sh`><fc=' ~ theme.red ~ '><fn=1>' ~ icon.power ~ '</fn></fc></action>'] %}
+-- xmobar: primary bar (screen 0)
+-- Managed by Ansible. Edit roles/base/templates/xmobarrc.j2 instead.
+-- https://codeberg.org/xmobar/xmobar
+--
+-- Left:  Debian menu, workspaces, layout, window title (from xmonad)
+-- Right: CPU, memory, disk, network, volume, keyboard, date, power menu
+-- Click: workspaces, layout, volume (scroll to change), keyboard, Debian logo and power icon
+
+Config { font            = "{{ bar_font }} {{ bar_primary_font_size }}"
+       , additionalFonts = [ "{{ bar_font }} {{ bar_primary_font_size + 2 }}"    -- fn=1: icons
+                           , "{{ bar_font }} Bold {{ bar_primary_font_size }}"   -- fn=2: bold
+                           ]
+       , bgColor         = "{{ theme.base }}"
+       , fgColor         = "{{ theme.text }}"
+       , alpha           = {{ bar_alpha }}
+       , position        = TopHM {{ bar_primary_height }} {{ bar_margin }} {{ bar_margin }} {{ bar_margin }} 0
+       , lowerOnStart    = True
+       , hideOnStart     = False
+       , allDesktops     = True
+       , persistent      = True
+       , commands = [
+                      -- Workspaces, layout and window title from xmonad.
+                      -- The workspaces are 'clickable' in my configs.
+                      Run UnsafeStdinReader
+                      -- Cpu usage in percent
+                    , Run Cpu [ "-t", "<fc={{ theme.orange }}><fn=1>{{ icon.cpu }}</fn></fc> <total>%"
+                              , "-p", "2", "-H", "80", "-h", "{{ theme.red }}"
+                              ] 20
+                      -- Ram used in percent
+                    , Run Memory [ "-t", "<fc={{ theme.green }}><fn=1>{{ icon.memory }}</fn></fc> <usedratio>%"
+                                 , "-p", "2", "-H", "85", "-h", "{{ theme.red }}"
+                                 ] 20
+                      -- Disk space free
+                    , Run DiskU [ ("/", "<fc={{ theme.blue }}><fn=1>{{ icon.disk }}</fn></fc> <free>") ] [] 600
+                      -- Network down and up on the active interface
+                    , Run DynNetwork [ "-t", "<fc={{ theme.teal }}><fn=1>{{ icon.down }}</fn></fc> <rx>  <fc={{ theme.teal }}><fn=1>{{ icon.up }}</fn></fc> <tx>"
+                                     , "-S", "True"
+                                     ] 20
+                      -- Volume of the default output. The script runs all the time
+                      -- and prints a new line when the volume changes.
+                    , Run CommandReader "{{ user_config_path }}/xmobar/scripts/volume.sh" "volume"
+                      -- Keyboard layout
+                    , Run Kbd [ ("ara", "<fc={{ theme.pink }}><fn=1>{{ icon.keyboard }}</fn></fc> AR")
+                              , ("us", "<fc={{ theme.pink }}><fn=1>{{ icon.keyboard }}</fn></fc> US")
+                              ]
+{% if has_battery | bool %}
+                      -- Battery
+                    , Run Battery [ "-t", "<acstatus> <left>%"
+                                  , "-p", "2", "-L", "20", "-l", "{{ theme.red }}"
+                                  , "--"
+                                  , "-O", "<fc={{ theme.green }}><fn=1>{{ icon.plug }}</fn></fc>"
+                                  , "-i", "<fc={{ theme.green }}><fn=1>{{ icon.battery }}</fn></fc>"
+                                  , "-o", "<fc={{ theme.yellow }}><fn=1>{{ icon.discharge }}</fn></fc>"
+                                  ] 50
+{% endif %}
+                      -- Time and date
+                    , Run Date "%a %d %b  <fn=2>%I:%M %p</fn>" "date" 50
+                    ]
+       , sepChar  = "%"
+       , alignSep = "}{"
+       -- The template must stay on one line
+       , template = "  {{ left | join('  ') }} }{ {{ right | join('    ') }}   "
+       }

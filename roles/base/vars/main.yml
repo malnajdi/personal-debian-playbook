@@ -2,19 +2,31 @@
 user_home_path: "/home/{{ user }}"
 user_config_path: "{{ user_home_path }}/.config"
 user_wallpaper_path: "{{ user_home_path }}/Wallpapers"
+user_wallpaper: "{{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png"
 
 directories:
   - "{{ user_config_path }}"
-  - "{{ user_config_path }}/compton"
+  - "{{ user_config_path }}/picom"
   - "{{ user_config_path }}/nitrogen"
   - "{{ user_config_path }}/i3lock"
   - "{{ user_config_path }}/xmobar"
+  - "{{ user_config_path }}/xmobar/scripts"
+  - "{{ user_config_path }}/rofi"
+  - "{{ user_config_path }}/dunst"
+  - "{{ user_config_path }}/gtk-3.0"
+  - "{{ user_config_path }}/gtk-4.0"
+  - "{{ user_config_path }}/nano"
   - "{{ user_config_path }}/Code/User"
   - "{{ user_home_path }}/.xmonad"
   - "{{ user_home_path }}/projects/work"
   - "{{ user_home_path }}/projects/web"
   - "{{ user_home_path }}/projects/devops"
   - "{{ user_home_path }}/projects/helping"
-  - "{{ user_home_path }}/projects/devops"
 
 xmonad_config_path: "{{ user_home_path }}/.xmonad"
+
+# The active color palette, see theme_palettes in defaults
+theme: "{{ theme_palettes[theme_name] }}"
+
+# The wallpaper copy that the login screen can read
+greeter_wallpaper: /usr/share/backgrounds/desktop-wallpaper.png

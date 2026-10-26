@@ -1,0 +1,40 @@
+#!/bin/sh
+# Managed by Ansible
+# Print the volume of the default audio output for xmobar (CommandReader).
+# It prints one line at start and one line after each change of the audio outputs.
+# It needs pactl (pulseaudio-utils) and a PulseAudio server (pipewire-pulse).
+
+# xmobar gets the xmonad log on stdin. Do not let child commands read it.
+exec </dev/null
+# Use the English pactl output for all locales
+export LC_ALL=C
+
+print_volume() {
+    vol=$(timeout 1 pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | awk -F/ 'NR == 1 { gsub(/[ %]/, "", $2); print $2 }')
+    mute=$(timeout 1 pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null)
+
+    if [ -z "$vol" ]; then
+        # volume off icon
+        printf '<fc={{ theme.overlay }}><fn=1></fn> --</fc>\n'
+    elif [ "$mute" = "Mute: yes" ]; then
+        # volume off icon
+        printf '<fc={{ theme.overlay }}><fn=1></fn> muted</fc>\n'
+    else
+        # volume up, down and off icons
+        if [ "$vol" -ge 50 ]; then icon=''; elif [ "$vol" -gt 0 ]; then icon=''; else icon=''; fi
+        printf '<fc={{ theme.yellow }}><fn=1>%s</fn></fc> %s%%\n' "$icon" "$vol"
+    fi
+}
+
+while :; do
+    # Stop when xmobar stops (the write fails)
+    print_volume || exit 0
+    # Wait for changes. pactl stops when the audio server stops, then try again.
+    # The time limit makes the loop write again, so the script stops soon after xmobar stops.
+    timeout 60 pactl subscribe 2>/dev/null | while read -r event; do
+        case "$event" in
+            *" on sink "*|*" on server "*) print_volume || exit 0 ;;
+        esac
+    done
+    sleep 1
+done

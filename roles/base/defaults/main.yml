@@ -4,6 +4,7 @@ group: malnajdi
 
 apt_set_source_list: true
 apt_enable_backports: true
+apt_components: main contrib non-free non-free-firmware
 enable_i386_arch: true
 
 essential_packages:
@@ -13,12 +14,11 @@ essential_packages:
   - aptitude
   - arandr
   - build-essential
-  - compton
-  - exa
+  - eza
   - fonts-font-awesome
   - fonts-noto
   - fonts-noto-color-emoji
-  - ibus-table-emoji
+  - ibus-table-emoticon
   - geany
   - gimp
   - git
@@ -31,16 +31,19 @@ essential_packages:
   - libghc-xmonad-dev
   - libxrandr-dev
   - lightdm
+  - lightdm-gtk-greeter
   - maven
   - mediainfo
   - menu
   - mercurial
+  - nano
   - net-tools
   - nitrogen
   - node-less
   - obs-studio
   - pavucontrol
-  - pulseaudio
+  - pipewire-audio
+  - pulseaudio-utils
   - rofi
   - rsync
   - ruby-sass
@@ -75,6 +78,24 @@ essential_packages:
   - fzf
   # - everdo
 
+# Packages for the desktop session: X server, compositor, notifications,
+# themes, and the libraries to build st.
+desktop_packages:
+  - xorg
+  - xdotool
+  - picom
+  - dunst
+  - libnotify-bin
+  - polkitd
+  - papirus-icon-theme
+  - gnome-themes-extra
+  - pkg-config
+  - libx11-dev
+  - libxft-dev
+  - libfontconfig-dev
+  - libfreetype-dev
+  - xz-utils
+
 snap_packages:
   - name: code
     classic: yes
@@ -85,17 +106,147 @@ snap_packages:
 # Name is the exact name in the files/wallpaper folder.
 default_user_wallpaper_name: "12"
 
-# Compton
-compton_opacity_apps:
-  - name: st
+# Number of monitors that nitrogen sets a wallpaper on
+wallpaper_screens: 4
+
+# Theme
+# One palette drives xmonad, xmobar, picom, rofi, dunst, st, GTK and lightdm.
+# Set theme_name to any key in theme_palettes.
+theme_name: catppuccin_mocha
+
+theme_palettes:
+  catppuccin_mocha:
+    gtk_theme: Adwaita-dark
+    icon_theme: Papirus-Dark
+    crust: "#11111b"
+    mantle: "#181825"
+    base: "#1e1e2e"
+    surface0: "#313244"
+    surface1: "#45475a"
+    surface2: "#585b70"
+    overlay: "#6c7086"
+    subtext: "#a6adc8"
+    text: "#cdd6f4"
+    accent: "#cba6f7"
+    red: "#f38ba8"
+    orange: "#fab387"
+    yellow: "#f9e2af"
+    green: "#a6e3a1"
+    teal: "#94e2d5"
+    blue: "#89b4fa"
+    pink: "#f5c2e7"
+    cursor: "#f5e0dc"
+    # Terminal colors 0-15
+    ansi:
+      - "#45475a"
+      - "#f38ba8"
+      - "#a6e3a1"
+      - "#f9e2af"
+      - "#89b4fa"
+      - "#f5c2e7"
+      - "#94e2d5"
+      - "#bac2de"
+      - "#585b70"
+      - "#f38ba8"
+      - "#a6e3a1"
+      - "#f9e2af"
+      - "#89b4fa"
+      - "#f5c2e7"
+      - "#94e2d5"
+      - "#a6adc8"
+  tokyo_night:
+    gtk_theme: Adwaita-dark
+    icon_theme: Papirus-Dark
+    crust: "#15161e"
+    mantle: "#16161e"
+    base: "#1a1b26"
+    surface0: "#292e42"
+    surface1: "#3b4261"
+    surface2: "#414868"
+    overlay: "#565f89"
+    subtext: "#a9b1d6"
+    text: "#c0caf5"
+    accent: "#7aa2f7"
+    red: "#f7768e"
+    orange: "#ff9e64"
+    yellow: "#e0af68"
+    green: "#9ece6a"
+    teal: "#73daca"
+    blue: "#7aa2f7"
+    pink: "#bb9af7"
+    cursor: "#c0caf5"
+    ansi:
+      - "#15161e"
+      - "#f7768e"
+      - "#9ece6a"
+      - "#e0af68"
+      - "#7aa2f7"
+      - "#bb9af7"
+      - "#7dcfff"
+      - "#a9b1d6"
+      - "#414868"
+      - "#f7768e"
+      - "#9ece6a"
+      - "#e0af68"
+      - "#7aa2f7"
+      - "#bb9af7"
+      - "#7dcfff"
+      - "#c0caf5"
+
+# Fonts
+# Nerd Fonts to download from https://github.com/ryanoasis/nerd-fonts/releases
+nerd_fonts_version: v3.5.1
+nerd_fonts:
+  - JetBrainsMono
+ui_font: JetBrainsMono Nerd Font
+ui_font_size: 11
+
+# Xmonad
+xmonad_border_width: 2
+# Gap in pixels between windows, and between windows and the screen edge
+xmonad_gap: 6
+# Show the workspace name in the middle of the screen when you change workspace
+xmonad_show_workspace_name: true
+
+# Xmobar
+# Screen 0 gets the primary bar. All other screens get the compact bar.
+# The "Propo" variant gives the icons their full width.
+bar_font: JetBrainsMono Nerd Font Propo
+bar_primary_height: 34
+bar_primary_font_size: 12
+bar_secondary_height: 30
+bar_secondary_font_size: 11
+# Space between the bar and the screen edges. Use 0 for a bar that touches the edges.
+# Two times the xmonad gap lines up the bar with the window edges.
+bar_margin: "{{ xmonad_gap * 2 }}"
+# 0 is fully transparent, 255 is opaque. Needs picom.
+bar_alpha: 235
+
+# Picom
+# Backend: glx, egl or xrender. If windows or the bar do not update, or the
+# screen is black, try "egl", then "xrender" (no blur with xrender).
+picom_backend: glx
+picom_corner_radius: 10
+picom_animations: true
+picom_opacity_apps:
+  - name: st-256color
     opacity: 95
-  - name: code
-    opacity: 95
+  - name: Code
+    opacity: 97
   - name: steam
     opacity: 100
+
+# Suckless terminal
+st_font_size: 20
+st_padding: 14
 
 # Vscode Extentions
 vscode_extentions:
   - EditorConfig.EditorConfig
   - mhutchie.git-graph
   - dbaeumer.vscode-eslint
+
+# Sysctl values for /etc/sysctl.d/99-local.conf
+# Used by reactjs watcher
+sysctl_settings:
+  fs.inotify.max_user_watches: 524288

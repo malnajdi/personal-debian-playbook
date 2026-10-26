@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Define the location of dmenu (change if necessary)
-DMENU='dmenu -i'
+# Menu program (rofi in dmenu mode, it uses the rofi theme)
+DMENU='rofi -dmenu -i -p alias'
 
 # Load aliases (ensure this matches where your aliases are defined)
 if [ -f ~/.bash_aliases ]; then

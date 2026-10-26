@@ -1,0 +1,112 @@
+/* rofi (launcher and menus)
+ * Managed by Ansible. Edit roles/base/templates/rofi.rasi.j2 instead.
+ */
+
+configuration {
+    modi:                "drun,run,window";
+    show-icons:          true;
+    icon-theme:          "{{ theme.icon_theme }}";
+    font:                "{{ ui_font }} {{ ui_font_size + 1 }}";
+    drun-display-format: "{name}";
+    display-drun:        "  Apps";
+    display-run:         "  Run";
+    display-window:      "  Windows";
+}
+
+* {
+    bg:               {{ theme.base }};
+    bg-alt:           {{ theme.surface0 }};
+    fg:               {{ theme.text }};
+    fg-dim:           {{ theme.overlay }};
+    accent:           {{ theme.accent }};
+    urgent:           {{ theme.red }};
+
+    background-color: transparent;
+    text-color:       @fg;
+    margin:           0;
+    padding:          0;
+    spacing:          0;
+}
+
+window {
+    location:         center;
+    width:            640px;
+    background-color: @bg;
+    border:           2px;
+    border-color:     @accent;
+    border-radius:    12px;
+}
+
+mainbox {
+    padding:  18px;
+    spacing:  14px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    background-color: @bg-alt;
+    border-radius:    8px;
+    padding:          10px 14px;
+    spacing:          12px;
+    children:         [ prompt, entry ];
+}
+
+prompt {
+    text-color: @accent;
+}
+
+entry {
+    placeholder:       "Search";
+    placeholder-color: @fg-dim;
+    cursor:            text;
+}
+
+listview {
+    lines:        8;
+    columns:      1;
+    fixed-height: true;
+    scrollbar:    false;
+    spacing:      4px;
+}
+
+element {
+    padding:       8px 12px;
+    border-radius: 8px;
+    spacing:       12px;
+}
+
+element normal.normal, element alternate.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element normal.urgent, element alternate.urgent {
+    text-color: @urgent;
+}
+
+element selected.normal {
+    background-color: @accent;
+    text-color:       @bg;
+}
+
+element selected.urgent {
+    background-color: @urgent;
+    text-color:       @bg;
+}
+
+element-icon {
+    size:             24px;
+    background-color: transparent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
+}
+
+message {
+    padding:          10px 14px;
+    border-radius:    8px;
+    background-color: @bg-alt;
+}

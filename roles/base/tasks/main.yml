@@ -1,38 +1,69 @@
 ---
 # Configure APT
+# Debian 13 uses the deb822 format in /etc/apt/sources.list.d/debian.sources
+- name: APT - find the Debian archive keyring
+  stat:
+    path: /usr/share/keyrings/debian-archive-keyring.pgp
+  register: apt_keyring_pgp
+
 - name: APT - set sources
   template:
-    src: sources.list.j2
-    dest: /etc/apt/sources.list
+    src: debian.sources.j2
+    dest: /etc/apt/sources.list.d/debian.sources
     owner: root
     group: root
     mode: 0644
+  vars:
+    apt_keyring: "/usr/share/keyrings/debian-archive-keyring.{{ 'pgp' if apt_keyring_pgp.stat.exists else 'gpg' }}"
+  when: apt_set_source_list
   register: apt_debian_sources
 
-- name: APT - set backports sources
-  template:
-    src: backports.list.j2
-    dest: /etc/apt/sources.list.d/backports.list
-  register: apt_backports_debian_sources
+- name: APT - remove old one-line sources
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list
+    - /etc/apt/sources.list.d/backports.list
+  when: apt_set_source_list
+  register: apt_old_sources
 
-- name: Configure archs
-  template:
-    src: arch.j2
-    dest: /var/lib/dpkg/arch
-    owner: root
-    group: root
-    mode: 0644
+- name: APT - get foreign architectures
+  command: dpkg --print-foreign-architectures
+  register: dpkg_foreign_archs
+  changed_when: false
+
+- name: APT - enable i386 architecture
+  command: dpkg --add-architecture i386
+  when: enable_i386_arch and 'i386' not in dpkg_foreign_archs.stdout_lines
   register: arch_configuration
 
 - name: APT - update debian sources
-  apt: update_cache=yes
-  when: apt_debian_sources.changed or apt_backports_debian_sources or arch_configuration.changed
+  apt:
+    update_cache: yes
+    cache_valid_time: "{{ 0 if (apt_debian_sources.changed or apt_old_sources.changed or arch_configuration.changed) else 3600 }}"
+
+- name: APT - accept the Steam license
+  debconf:
+    name: steam
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  loop:
+    - { question: steam/question, value: "I AGREE", vtype: select }
+    - { question: steam/license, value: "", vtype: note }
+  when: "'steam' in essential_packages"
 
 - name: APT - install essential packages
   apt:
-    name: "{{ essential_packages }}"
+    name: "{{ essential_packages + desktop_packages }}"
 
 # Install Spand packages
+- name: Snapd - wait for the snap system to be ready
+  command: snap wait system seed.loaded
+  changed_when: false
+  ignore_errors: yes
+
 - name: Snapd - install packages
   snap:
     name: "{{ item.name }}"
@@ -46,21 +77,50 @@
     state: directory
     owner: "{{ user }}"
     group: "{{ group }}"
-    recurse: yes
   loop: "{{ directories }}"
 
-# Compton
-- name: Configure Compton
+- name: Create system directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - /etc/lightdm/lightdm.conf.d
+    - /usr/share/backgrounds
+
+# Remove files from the old setup (compton, two xmobar configs, polkit pkla)
+- name: Remove replaced configuration files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ user_config_path }}/compton"
+    - "{{ user_config_path }}/xmobar/xmobarrc0"
+    - "{{ user_config_path }}/xmobar/xmobarrc1"
+    - "{{ user_config_path }}/.nanorc"
+    - /etc/polkit-1/localauthority/50-local.d/allow-mount-policy.pkla
+
+# Picom (compositor: rounded corners, shadows, blur, fading)
+- name: Configure picom
   template:
-    src: compton.conf.j2
-    dest: "{{ user_config_path }}/compton/compton.conf"
+    src: picom.conf.j2
+    dest: "{{ user_config_path }}/picom/picom.conf"
     owner: "{{ user }}"
     group: "{{ group }}"
-  notify: restart compton
+  notify: reload picom
+
+# X session start (starts picom before xmonad)
+- name: Configure .xsessionrc
+  template:
+    src: .xsessionrc.j2
+    dest: "{{ user_home_path }}/.xsessionrc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
 
 # Suckless Terminal
-# TODO package should be downloaded and extracted and built
-# File should be exists in this role.
 - name: Check if suckless terminal (st) is installed
   stat:
     path: /usr/local/bin/st
@@ -86,16 +146,37 @@
   command: make clean install
   args:
     chdir: "{{ user_config_path }}/st-0.8.2/"
-  when: st_configured.changed
+  when: st_configured.changed or not st_installed.stat.exists
 
-# Dmenu
-- name: Configure dmenu
+# Rofi (application launcher and menus)
+- name: Configure rofi
   template:
-    src: alias_dmenu.sh.j2
-    dest: "{{ user_config_path }}/alias_dmenu.sh"
+    src: rofi.rasi.j2
+    dest: "{{ user_config_path }}/rofi/config.rasi"
     owner: "{{ user }}"
     group: "{{ group }}"
-    mode: 0766
+    mode: 0644
+
+- name: Configure rofi scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ user_config_path }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0755
+  loop:
+    - alias_dmenu.sh
+    - powermenu.sh
+
+# Dunst (notifications)
+- name: Configure dunst
+  template:
+    src: dunstrc.j2
+    dest: "{{ user_config_path }}/dunst/dunstrc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  notify: restart dunst
 
 # Xmonad
 - name: Configure xmonad
@@ -104,9 +185,28 @@
     dest: "{{ xmonad_config_path }}/xmonad.hs"
     owner: "{{ user }}"
     group: "{{ group }}"
+  register: xmonad_configured
+
+- name: Check if xmonad is compiled
+  stat:
+    path: "{{ xmonad_config_path }}/xmonad-{{ ansible_architecture }}-linux"
+  register: xmonad_compiled
+
+- name: Compile xmonad
+  command: xmonad --recompile
+  become: true
+  become_user: "{{ user }}"
+  when: xmonad_configured.changed or not xmonad_compiled.stat.exists
   notify: restart xmonad
 
 # Xmobar
+- name: Check for a battery
+  find:
+    paths: /sys/class/power_supply
+    patterns: "BAT*"
+    file_type: any
+  register: power_supply_batteries
+
 - name: Configure xmobars
   template:
     src: "{{ item }}.j2"
@@ -114,9 +214,21 @@
     owner: "{{ user }}"
     group: "{{ group }}"
   loop:
-    - xmobarrc0
-    - xmobarrc1
+    - xmobarrc
+    - xmobarrc-secondary
+  vars:
+    has_battery: "{{ power_supply_batteries.matched > 0 }}"
   notify: restart xmonad
+
+- name: Configure xmobar scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ user_config_path }}/xmobar/scripts/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0755
+  loop:
+    - volume.sh
 
 # .Xresources
 - name: Configure .Xresources
@@ -126,6 +238,26 @@
     owner: "{{ user }}"
     group: "{{ group }}"
   notify: reload xresources
+
+# GTK (dark theme and icons for GTK applications)
+- name: Configure GTK 3 and GTK 4
+  template:
+    src: gtk-settings.ini.j2
+    dest: "{{ user_config_path }}/{{ item }}/settings.ini"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop:
+    - gtk-3.0
+    - gtk-4.0
+
+- name: Configure GTK 2
+  template:
+    src: .gtkrc-2.0.j2
+    dest: "{{ user_home_path }}/.gtkrc-2.0"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
 
 # Fonts
 - name: Install Fonts
@@ -137,11 +269,44 @@
   loop: "{{ q('fileglob', 'files/fonts/*.ttf') }}"
   notify: update font cache
 
+- name: Create Nerd Fonts directories
+  file:
+    path: "/usr/local/share/fonts/nerd-fonts/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop: "{{ nerd_fonts }}"
+
+- name: Install Nerd Fonts
+  unarchive:
+    src: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ item }}.tar.xz"
+    dest: "/usr/local/share/fonts/nerd-fonts/{{ item }}"
+    remote_src: yes
+    creates: "/usr/local/share/fonts/nerd-fonts/{{ item }}/{{ nerd_fonts_version }}"
+  loop: "{{ nerd_fonts }}"
+  register: nerd_fonts_installed
+  notify: update font cache
+
+- name: Mark Nerd Fonts version
+  copy:
+    content: ""
+    dest: "/usr/local/share/fonts/nerd-fonts/{{ item }}/{{ nerd_fonts_version }}"
+  loop: "{{ nerd_fonts }}"
+  when: nerd_fonts_installed.changed
+
+# Flush the font cache now, so the next steps can use the new fonts
+- name: Flush handlers
+  meta: flush_handlers
+
 # Nitrogen & wallpapers
 - name: Copy wallpapers
-  synchronize:
+  copy:
     src: wallpapers/
-    dest: "{{ user_wallpaper_path }}"
+    dest: "{{ user_wallpaper_path }}/"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
 
 - name: Configure nitrogen & wallpaper
   template:
@@ -154,6 +319,28 @@
     - bg-saved.cfg
   register: nitrogen_status
   notify: restore nitrogen
+
+# Login screen (lightdm)
+- name: Copy wallpaper for the login screen
+  copy:
+    src: "wallpapers/{{ default_user_wallpaper_name }}.png"
+    dest: "{{ greeter_wallpaper }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure lightdm
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - src: lightdm-gtk-greeter.conf.j2
+      dest: /etc/lightdm/lightdm-gtk-greeter.conf
+    - src: lightdm-xmonad.conf.j2
+      dest: /etc/lightdm/lightdm.conf.d/50-xmonad.conf
 
 # Lock Screen (i3lock)
 - name: Configure i3lock script
@@ -172,8 +359,6 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: a+x
-  notify:
-    - restart xmonad
 
 # Bash Aliases
 - name: Enable bash aliases
@@ -184,23 +369,25 @@
     group: "{{ group }}"
     mode: 0644
 
-- name: Configure polkit policies
+# Polkit reads the rules again when a file changes. A restart is not necessary.
+- name: Configure polkit rules
   template:
     src: "{{ item }}.j2"
-    dest: "/etc/polkit-1/localauthority/50-local.d/{{ item }}"
-  loop:
-    - allow-mount-policy.pkla
-  notify: restart polkit
-
-# sysctl
-# Used by reactjs watcher
-- name: Configure sysctl
-  template:
-    src: sysctl.conf.j2
-    dest: /etc/sysctl.conf
+    dest: "/etc/polkit-1/rules.d/{{ item }}"
     owner: root
     group: root
     mode: 0644
+  loop:
+    - 50-allow-mount.rules
+
+# sysctl
+# Debian 13 does not read /etc/sysctl.conf. Use /etc/sysctl.d.
+- name: Configure sysctl
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-local.conf
+  loop: "{{ sysctl_settings | dict2items }}"
 
 # User Groups
 - name: Add default user to virt-manager group
@@ -225,34 +412,35 @@
     - keybindings.json
 
 # Install vscode extentions
+- name: Check if vscode is installed
+  stat:
+    path: /snap/bin/code
+  register: vscode_installed
+
 - name: Install vscode extentions
   command: 'snap run code --install-extension {{ item }}'
   loop: "{{ vscode_extentions }}"
   become: true
   become_user: "{{ user }}"
+  when: vscode_installed.stat.exists
   ignore_errors: yes
 
 # Nano
-- name: Get nano config
-  git:
-    repo: http://github.com/serialhex/nano-highlight.git
-    dest: '{{ user_home_path }}/.nano'
-  become: true
-  become_user: "{{ user }}"
-
 - name: Configure nano
   template:
     src: ".nanorc.j2"
-    dest: "{{ user_config_path }}/.nanorc"
+    dest: "{{ user_config_path }}/nano/nanorc"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
 
 - name: Set nano as default editor
-  command: 'update-alternatives --set editor /bin/nano'
+  alternatives:
+    name: editor
+    path: /bin/nano
 
 # GIT
-- name: Configure nano
+- name: Configure git
   template:
     src: ".gitconfig.j2"
     dest: "{{ user_home_path }}/.gitconfig"

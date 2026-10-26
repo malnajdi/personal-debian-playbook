@@ -1,0 +1,14 @@
+# Managed by Ansible
+[greeter]
+background = {{ greeter_wallpaper }}
+user-background = false
+theme-name = {{ theme.gtk_theme }}
+icon-theme-name = {{ theme.icon_theme }}
+cursor-theme-name = Adwaita
+font-name = {{ ui_font }} {{ ui_font_size }}
+xft-antialias = true
+xft-hintstyle = hintslight
+xft-rgba = rgb
+indicators = ~host;~spacer;~clock;~spacer;~layout;~session;~a11y;~power
+clock-format = %a %d %b  %I:%M %p
+position = 50%,center 50%,center

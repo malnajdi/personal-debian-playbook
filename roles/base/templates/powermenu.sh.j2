@@ -1,0 +1,21 @@
+#!/bin/sh
+# Managed by Ansible
+# Power menu with rofi: lock, log out, suspend, reboot and power off.
+
+lock="{{ user_config_path }}/i3lock/lock_multi_screen.sh"
+
+choice=$(printf '%s\n' \
+    "  Lock" \
+    "  Log out" \
+    "  Suspend" \
+    "  Reboot" \
+    "  Power off" \
+    | rofi -dmenu -i -p "Power" -theme-str 'window { width: 360px; } listview { lines: 5; }')
+
+case "$choice" in
+    *Lock)        "$lock" ;;
+    *"Log out")   loginctl terminate-session "$XDG_SESSION_ID" ;;
+    *Suspend)     "$lock" & sleep 1 && systemctl suspend ;;
+    *Reboot)      systemctl reboot ;;
+    *"Power off") systemctl poweroff ;;
+esac

@@ -5,8 +5,8 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "DejaVu Sans Mono:style=Regular:pixelsize=22:antialias=true:autohint=true";
-static int borderpx = 2;
+static char *font = "{{ ui_font }}:style=Regular:pixelsize={{ st_font_size }}:antialias=true:autohint=true";
+static int borderpx = {{ st_padding }};
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -82,37 +82,24 @@ char *termname = "st-256color";
  */
 unsigned int tabspaces = 8;
 
-/* bg opacity */
-unsigned int alpha = 0x01;
-
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-	/* 8 normal colors */
-	"#282a36",
-	"#ff5555",
-	"#50fa7b",
-	"#f1fa8c",
-	"#bd93f9",
-	"#ff79c6",
-	"#8be9fd",
-	"#bbbbbb",
+	/* 8 normal colors ({{ theme_name }}) */
+{% for color in theme.ansi[:8] %}
+	"{{ color }}",
+{% endfor %}
 
 	/* 8 bright colors */
-	"#44475a",
-	"#FF6E67",
-	"#5AF78E",
-	"#F4F99D",
-	"#CAA9FA",
-	"#FF92D0",
-	"#9AEDFE",
-	"#E6E6E6",
+{% for color in theme.ansi[8:] %}
+	"{{ color }}",
+{% endfor %}
 
 	[255] = 0,
 
 	/* more colors can be added after 255 to use with DefaultXX */
-	"#282a36",
-	"#f8f8f2",
-	"#d7d7d7",
+	"{{ theme.base }}",
+	"{{ theme.text }}",
+	"{{ theme.cursor }}",
 };
 
 

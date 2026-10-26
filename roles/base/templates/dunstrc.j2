@@ -1,0 +1,62 @@
+# dunst (notifications)
+# Managed by Ansible. Edit roles/base/templates/dunstrc.j2 instead.
+# Notifications show at the top right, below the bar.
+
+[global]
+    monitor = 0
+    follow = mouse
+    width = 380
+    height = 240
+    origin = top-right
+    offset = {{ bar_margin }}x{{ (bar_margin | int) * 2 + bar_primary_height }}
+    notification_limit = 5
+    progress_bar = true
+    progress_bar_frame_width = 0
+    progress_bar_corner_radius = 4
+    highlight = "{{ theme.accent }}"
+    padding = 14
+    horizontal_padding = 16
+    text_icon_padding = 14
+    frame_width = 2
+    gap_size = 8
+    separator_color = frame
+    sort = yes
+    font = {{ ui_font }} {{ ui_font_size }}
+    markup = full
+    format = "<b>%s</b>\n%b"
+    alignment = left
+    vertical_alignment = center
+    show_age_threshold = 60
+    ellipsize = end
+    ignore_newline = no
+    stack_duplicates = true
+    hide_duplicate_count = false
+    show_indicators = yes
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 48
+    icon_theme = "{{ theme.icon_theme }}"
+    enable_recursive_icon_lookup = true
+    corner_radius = {{ picom_corner_radius }}
+    mouse_left_click = do_action, close_current
+    mouse_middle_click = close_all
+    mouse_right_click = close_current
+
+[urgency_low]
+    background = "{{ theme.base }}"
+    foreground = "{{ theme.subtext }}"
+    frame_color = "{{ theme.surface1 }}"
+    timeout = 5
+
+[urgency_normal]
+    background = "{{ theme.base }}"
+    foreground = "{{ theme.text }}"
+    frame_color = "{{ theme.accent }}"
+    timeout = 8
+
+[urgency_critical]
+    background = "{{ theme.base }}"
+    foreground = "{{ theme.text }}"
+    frame_color = "{{ theme.red }}"
+    highlight = "{{ theme.red }}"
+    timeout = 0

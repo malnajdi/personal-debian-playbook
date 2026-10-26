@@ -22,11 +22,12 @@ done
 #Image paths
 if [ "$arg_image" ]; then
     BKG_IMG="$arg_image"  # Passed image
-elif [ -f "/home/malnajdi/Wallpapers/{{ default_user_wallpaper_name }}.png" ]; then
-    BKG_IMG="/home/malnajdi/Wallpapers/{{ default_user_wallpaper_name }}.png"  # Default image
 else
-    BKG_IMG="/home/malnajdi/Wallpapers/{{ default_user_wallpaper_name }}.png"  # Fallback to current folder
+    BKG_IMG="{{ user_wallpaper }}"  # Default image
 fi
+
+#ImageMagick 7 (Debian 13) uses "magick", older versions use "convert"
+CONVERT=$(command -v magick || command -v convert)
 
 if ! [ -e "$BKG_IMG" ]; then
     echo "No background image! Exiting..."
@@ -40,7 +41,7 @@ OUTPUT_IMG_WIDTH=0 # Decide size to cover all screens
 OUTPUT_IMG_HEIGHT=0 # Decide size to cover all screens
 
 #i3lock command
-LOCK_BASE_CMD="i3lock -i $OUTPUT_IMG"
+LOCK_BASE_CMD="i3lock -i $OUTPUT_IMG -c {{ theme.base | replace('#', '') }}"
 if [ "$lock_args" ]; then
         LOCK_ARGS="$lock_args"  # Passed command
 else
@@ -71,7 +72,7 @@ do
     if ! [ -e $CACHE_IMG ]
     then
 	# Create image for that screensize
-        eval convert '$BKG_IMG' '-resize' '${SCREEN_WIDTH}X${SCREEN_HEIGHT}^' '-gravity' 'Center' '-crop' '${SCREEN_WIDTH}X${SCREEN_HEIGHT}+0+0' '+repage' '$CACHE_IMG'
+        eval $CONVERT '$BKG_IMG' '-resize' '${SCREEN_WIDTH}X${SCREEN_HEIGHT}^' '-gravity' 'Center' '-crop' '${SCREEN_WIDTH}X${SCREEN_HEIGHT}+0+0' '+repage' '$CACHE_IMG'
     fi
 
     # Decide size of output image
@@ -83,8 +84,8 @@ do
 done <<<"`xrandr`"
 
 #Execute ImageMagick:
-eval convert -size ${OUTPUT_IMG_WIDTH}x${OUTPUT_IMG_HEIGHT} 'xc:black' $OUTPUT_IMG
-eval convert $OUTPUT_IMG $PARAMS $OUTPUT_IMG
+eval $CONVERT -size ${OUTPUT_IMG_WIDTH}x${OUTPUT_IMG_HEIGHT} 'xc:black' $OUTPUT_IMG
+eval $CONVERT $OUTPUT_IMG $PARAMS $OUTPUT_IMG
 
 #Lock the screen:
 $LOCK_CMD

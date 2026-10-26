@@ -1,15 +1,31 @@
 ---
+# The X handlers apply changes to a running session. On a fresh install
+# there is no X session yet, so they do not fail.
 - name: restart xmonad
   command: xmonad --restart
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    DISPLAY: ":0"
+  failed_when: false
 
 - name: restore nitrogen
   command: nitrogen --restore
   become: true
   become_user: "{{ user }}"
+  environment:
+    DISPLAY: ":0"
+  failed_when: false
 
-- name: restart compton
-  shell: "killall compton && compton --config /home/malnajdi/.config/compton/compton.conf &"
-  ignore_errors: yes
+# Picom reads its configuration again when it gets SIGUSR1
+- name: reload picom
+  command: pkill -USR1 -x -u {{ user }} picom
+  failed_when: false
+
+# D-Bus starts dunst again with the new configuration at the next notification
+- name: restart dunst
+  command: pkill -x -u {{ user }} dunst
+  failed_when: false
 
 - name: reload deamon
   command: "systemctl daemon-reload"
@@ -19,11 +35,11 @@
 
 - name: update font cache
   command: "fc-cache -f"
- 
-- name: restart polkit
-  service:
-    name: polkit
-    state: restarted
 
 - name: reload xresources
-  command: "xrdb /home/malnajdi/.Xresources"
+  command: "xrdb -merge {{ user_home_path }}/.Xresources"
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    DISPLAY: ":0"
+  failed_when: false
