@@ -245,7 +245,8 @@ picom_opacity_apps:
     opacity: 100
 
 # Suckless terminal
-st_font_size: 20
+# Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.
+st_font_size: 15
 st_padding: 14
 
 # Vscode Extentions
