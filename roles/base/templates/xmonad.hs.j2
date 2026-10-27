@@ -7,6 +7,7 @@
 ------------------------------------------------------------------------
     -- Base
 import XMonad
+import Control.Monad (forM, forM_, when)
 import GHC.IO.Encoding (setLocaleEncoding, utf8)
 import System.Exit (exitSuccess)
 import qualified XMonad.StackSet as W
@@ -22,7 +23,7 @@ import XMonad.Actions.WithAll (sinkAll, killAll)
 
     -- Data
 import Data.Char (toLower)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (catMaybes, fromMaybe)
 
     -- Hooks
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhFullscreen)
@@ -56,6 +57,7 @@ import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.Image (Placement(OffsetLeft))
 import XMonad.Util.Loggers
 import XMonad.Util.SpawnOnce
+import XMonad.Util.WindowProperties (getProp32)
 
 ------------------------------------------------------------------------
 -- THEME ({{ theme_name }})
@@ -215,6 +217,7 @@ myKeys =
 
     -- Layouts
         , ("M-<Tab>", sendMessage NextLayout)                                    -- Switch to next layout
+        , ("M-C-<Tab>", asks (layoutHook . config) >>= setLayout)                -- Reset the layout (and its settings, for example the tab colors)
         , ("M-<Space>", sendMessage (MT.Toggle NBFULL) >> sendMessage ToggleStruts) -- Toggles noborder/full
         , ("M-S-<Space>", sendMessage ToggleStruts)                              -- Toggles struts
         , ("M-S-n", sendMessage $ MT.Toggle NOBORDERS)                              -- Toggles noborder
@@ -342,6 +345,47 @@ tabs     = renamed [Replace "tabs"]
     -- It is wider than any screen; the tab cuts it to its own width.
     underline = replicate 2 (replicate 4000 True)
 
+-- Windows in the tabs layout get the property _XMONAD_TABBED = 1, the other
+-- windows on the screen get 0. picom draws the tabbed windows without rounded top
+-- corners and shadow, so the window joins its tabs. The value changes to 0 (the
+-- property stays), because picom 12 does not see that a property is deleted.
+markTabbed :: X ()
+markTabbed = withDisplay $ \dpy -> do
+    atom <- getAtom "_XMONAD_TABBED"
+    screens <- gets (W.screens . windowset)
+    forM_ screens $ \scr -> do
+        let ws    = W.workspace scr
+            value = if description (W.layout ws) == "tabs" then 1 else 0
+        forM_ (W.integrate' (W.stack ws)) $ \w -> do
+            marked <- getProp32 atom w
+            when (marked /= Just [value]) $
+                io $ changeProperty32 dpy w atom cARDINAL propModeReplace [value]
+
+-- Each visible tab gets the property _XMONAD_TAB_CORNERS: 1 for the first tab of a
+-- row, 2 for the last tab, 3 for the only tab and 0 for the tabs between. picom
+-- rounds only these outer corners, so the tabs and the window have one outline.
+markTabCorners :: X ()
+markTabCorners = withDisplay $ \dpy -> do
+    atom <- getAtom "_XMONAD_TAB_CORNERS"
+    root <- asks theRoot
+    (_, _, children) <- io $ queryTree dpy root
+    tabs <- fmap catMaybes . forM children $ \w -> do
+        cls   <- io $ getClassHint dpy w
+        -- A tab can close while xmonad reads it
+        attrs <- catchX (Just <$> io (getWindowAttributes dpy w)) (return Nothing)
+        return $ case attrs of
+            Just wa | resName cls == "xmonad-decoration" && wa_map_state wa == waIsViewable
+                -> Just (w, wa_x wa, wa_y wa, wa_width wa)
+            _   -> Nothing
+    forM_ tabs $ \(w, x, y, width) -> do
+        -- Tabs of the same window touch each other on the same row
+        let hasLeft  = any (\(_, x', y', w') -> y' == y && x' + w' == x) tabs
+            hasRight = any (\(_, x', y', _)  -> y' == y && x' == x + width) tabs
+            corners  = (if hasLeft then 0 else 1) + (if hasRight then 0 else 2)
+        marked <- getProp32 atom w
+        when (marked /= Just [corners]) $
+            io $ changeProperty32 dpy w atom cARDINAL propModeReplace [corners]
+
 -- Big workspace name in the middle of the screen after a workspace change
 mySWNConfig :: SWNConfig
 mySWNConfig = def { swn_font    = "xft:{{ ui_font }}:bold:size=48"
@@ -425,6 +469,7 @@ main = do
         , terminal           = myTerminal
         , startupHook        = myStartupHook
         , layoutHook         = myLayoutHook
+        , logHook            = markTabbed >> markTabCorners
         , workspaces         = myWorkspaces
         , borderWidth        = myBorderWidth
         , normalBorderColor  = myNormColor

@@ -1,0 +1,38 @@
+#version 330
+// Managed by Ansible. Edit roles/base/templates/picom-corners.glsl.j2 instead.
+// picom shader that rounds only some corners of a window: {{ item.corners | join(', ') }}.
+// The tabs layout of xmonad uses it, so the tabs and the window under them
+// look like one window with rounded outer corners.
+
+in vec2 texcoord;
+uniform sampler2D tex;
+
+vec4 default_post_processing(vec4 c);
+
+const float radius = {{ picom_corner_radius }}.0;
+const bool top_left     = {{ ('top-left'     in item.corners) | lower }};
+const bool top_right    = {{ ('top-right'    in item.corners) | lower }};
+const bool bottom_left  = {{ ('bottom-left'  in item.corners) | lower }};
+const bool bottom_right = {{ ('bottom-right' in item.corners) | lower }};
+
+vec4 window_shader() {
+    vec2 size = vec2(textureSize(tex, 0));
+    vec4 c = default_post_processing(texelFetch(tex, ivec2(texcoord), 0));
+
+    // The center of the corner circle, when this pixel is in a rounded corner
+    vec2 center = vec2(-1.0);
+    if (top_left && texcoord.x < radius && texcoord.y < radius)
+        center = vec2(radius, radius);
+    else if (top_right && texcoord.x > size.x - radius && texcoord.y < radius)
+        center = vec2(size.x - radius, radius);
+    else if (bottom_left && texcoord.x < radius && texcoord.y > size.y - radius)
+        center = vec2(radius, size.y - radius);
+    else if (bottom_right && texcoord.x > size.x - radius && texcoord.y > size.y - radius)
+        center = vec2(size.x - radius, size.y - radius);
+
+    if (center.x >= 0.0) {
+        // Smooth edge of one pixel. The colors are premultiplied, so scale all of c.
+        c *= clamp(radius - distance(texcoord, center) + 0.5, 0.0, 1.0);
+    }
+    return c;
+}

@@ -145,6 +145,16 @@
     group: "{{ group }}"
   notify: restart picom
 
+- name: Configure picom shaders
+  template:
+    src: picom-corners.glsl.j2
+    dest: "{{ user_config_path }}/picom/shaders/{{ item.name }}.glsl"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop: "{{ picom_corner_shaders }}"
+  notify: restart picom
+
 # X session start (starts picom before xmonad)
 - name: Configure .xsessionrc
   template:

@@ -27,6 +27,9 @@ fade-delta = 5;
 
 # Rounded corners
 corner-radius = {{ picom_corner_radius }};
+# Blend all windows, also windows without transparency. The corner shaders (tabs
+# layout) make pixels transparent, and without blending these pixels are black.
+force-win-blend = true;
 
 # Blur behind transparent windows (bar, terminal)
 blur: {
@@ -51,6 +54,20 @@ rules = (
 
   # Window decorations of xmonad (tabs) and the workspace name
   { match = "class_g = 'xmonad' || class_g = 'xmonad-decoration'"; shadow = false; corner-radius = 0; dim = 0; },
+
+  # Tabs layout of xmonad: the tabs and the window under them look like one window.
+  # xmonad sets _XMONAD_TABBED on the window, and _XMONAD_TAB_CORNERS on each tab
+  # (1: first tab, 2: last tab, 3: the only tab). The shaders round only the outer
+  # corners. Shaders need the glx or egl backend. "@" reads the property of the
+  # frame window: picom 12 does not see changes of the client properties.
+  { match = "_XMONAD_TABBED@ = 1"; corner-radius = 0; shadow = false;
+    shader = "{{ user_config_path }}/picom/shaders/round-bottom.glsl"; },
+  { match = "_XMONAD_TAB_CORNERS@ = 1";
+    shader = "{{ user_config_path }}/picom/shaders/round-top-left.glsl"; },
+  { match = "_XMONAD_TAB_CORNERS@ = 2";
+    shader = "{{ user_config_path }}/picom/shaders/round-top-right.glsl"; },
+  { match = "_XMONAD_TAB_CORNERS@ = 3";
+    shader = "{{ user_config_path }}/picom/shaders/round-top.glsl"; },
 
   # Full screen windows (videos, games, lock screen)
   { match = "fullscreen"; corner-radius = 0; shadow = false; dim = 0; },

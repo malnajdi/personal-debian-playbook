@@ -87,6 +87,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `Super + Shift + 1` to `7` | Move the window to a workspace          |
 | `Super + W`, `E`, `R`    | Go to monitor 1, 2, 3                     |
 | `Super + Tab`            | Next layout (tall, monocle, floats, grid, tabs) |
+| `Super + Ctrl + Tab`     | Reset the layout of the workspace         |
 | `Super + Space`          | Full screen on and off                    |
 | `Super + F`              | Floating layout on and off                |
 | `Super + Shift + C`      | Close the window                          |

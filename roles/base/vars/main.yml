@@ -7,6 +7,7 @@ user_wallpaper: "{{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png
 directories:
   - "{{ user_config_path }}"
   - "{{ user_config_path }}/picom"
+  - "{{ user_config_path }}/picom/shaders"
   - "{{ user_config_path }}/nitrogen"
   - "{{ user_config_path }}/i3lock"
   - "{{ user_config_path }}/xmobar"
@@ -22,6 +23,13 @@ directories:
   - "{{ user_home_path }}/projects/web"
   - "{{ user_home_path }}/projects/devops"
   - "{{ user_home_path }}/projects/helping"
+
+# picom shaders that round only some corners of a window (tabs layout of xmonad)
+picom_corner_shaders:
+  - { name: round-top-left, corners: [top-left] }
+  - { name: round-top-right, corners: [top-right] }
+  - { name: round-top, corners: [top-left, top-right] }
+  - { name: round-bottom, corners: [bottom-left, bottom-right] }
 
 xmonad_config_path: "{{ user_home_path }}/.xmonad"
 
