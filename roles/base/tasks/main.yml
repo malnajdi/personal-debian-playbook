@@ -133,6 +133,7 @@
     - "{{ user_config_path }}/xmobar/xmobarrc1"
     - "{{ user_config_path }}/xmobar/xmobarrc-secondary"
     - "{{ user_config_path }}/.nanorc"
+    - "{{ user_config_path }}/Code/User/vscode.json"
     - /etc/polkit-1/localauthority/50-local.d/allow-mount-policy.pkla
 
 # Picom (compositor: rounded corners, shadows, blur, fading)
@@ -440,16 +441,17 @@
   when: has_bluetooth
 
 # .files
+# VSCode reads its settings from settings.json
 - name: Configure VSCode
   template:
-    src: "{{ item }}.j2"
-    dest: "{{ user_config_path }}/Code/User/{{ item }}"
+    src: "{{ item.src }}.j2"
+    dest: "{{ user_config_path }}/Code/User/{{ item.dest }}"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
   loop:
-    - vscode.json
-    - keybindings.json
+    - { src: vscode.json, dest: settings.json }
+    - { src: keybindings.json, dest: keybindings.json }
 
 # Install vscode extentions
 - name: Check if vscode is installed

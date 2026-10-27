@@ -30,3 +30,4 @@
 * Paths use the `user` variable, not a fixed home directory.
 * The bar shows the window title without xmobar tags from the title.
 * The st font is 15 px (was 20 px), the same size as the rest of the desktop.
+* VSCode settings are installed as `settings.json` (VSCode did not read `vscode.json`), and zen mode does not make the window full screen.
