@@ -29,7 +29,7 @@ import Data.Maybe (catMaybes, fromMaybe)
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhFullscreen)
 import XMonad.Hooks.InsertPosition (insertPosition, Focus(Newer), Position(End))
 import XMonad.Hooks.ManageDocks (avoidStruts, docks, ToggleStruts(..))
-import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
+import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, doRectFloat, isDialog, isFullscreen)
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 
@@ -108,6 +108,7 @@ myStartupHook = do
           -- Set the monitor layout first, then the wallpaper on each monitor
           spawnOnce "[ -f ~/.screenlayout/screen.sh ] && sh ~/.screenlayout/screen.sh; nitrogen --restore"
           spawnOnce "xsetroot -cursor_name left_ptr"
+          spawnOnce "copyq --start-server"    -- Clipboard history
           spawnOnce "flameshot"               -- Screenshots (no tray icon)
           -- picom starts from ~/.xsessionrc, before xmonad and the bars
 
@@ -255,6 +256,9 @@ myKeys =
         , ("S-<Print>", spawn "flameshot screen --clipboard")                 -- This monitor
         , ("C-<Print>", spawn "flameshot full --clipboard")                   -- All monitors
 
+    --- Clipboard history (CopyQ)
+        , ("M-v", spawn "copyq toggle")
+
     --- My Applications (Super+Alt+Key)
         --, ("M-M1-a", spawn (myTerminal ++ " -e ncpamixer"))
 
@@ -299,6 +303,7 @@ myManageHook = composeAll
      , classIs ["gimp", "gimp-2.10", "gimp-3.0"]          --> doShift "draw"
      , classIs ["code"]                                   --> doShift "dev"
      , classIs ["pavucontrol", "org.pulseaudio.pavucontrol"] --> doCenterFloat
+     , classIs ["copyq"]                                  --> doRectFloat (W.RationalRect (1/3) (1/6) (1/3) (2/3))
      , classIs ["flameshot"]                              --> doFloat   -- Pinned screenshots and settings
      , isDialog                                           --> doCenterFloat
      ]

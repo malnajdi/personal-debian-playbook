@@ -655,3 +655,54 @@
       uiColor: "{{ theme.accent }}"
       contrastUiColor: "{{ theme.base }}"
       userColors: "picker, {{ [theme.red, theme.orange, theme.yellow, theme.green, theme.blue, theme.accent, theme.text, theme.crust] | join(', ') }}"
+
+# Clipboard history (CopyQ)
+# CopyQ writes its own settings to this file too, so set only these keys.
+- name: Configure CopyQ
+  ini_file:
+    path: "{{ user_config_path }}/copyq/copyq.conf"
+    section: "{{ item.0.section }}"
+    option: "{{ item.1.key }}"
+    value: "{{ item.1.value }}"
+    no_extra_spaces: yes
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop: "{{ copyq_settings | subelements('options') }}"
+  loop_control:
+    label: "{{ item.0.section }}/{{ item.1.key }}"
+  vars:
+    copyq_font: "{{ ui_font }},{{ ui_font_size }},-1,5,50,0,0,0,0,0"
+    copyq_settings:
+      - section: Options
+        options:
+          - { key: maxitems, value: "{{ copyq_max_items }}" }
+          # xmobar has no tray. Esc or a click on an other window hides CopyQ.
+          - { key: disable_tray, value: "true" }
+          - { key: hide_main_window, value: "true" }
+          - { key: hide_toolbar, value: "true" }
+          # Enter copies the item and pastes it with Shift+Insert. st pastes
+          # the mouse selection with Shift+Insert, so copy to it too.
+          - { key: copy_clipboard, value: "true" }
+          - { key: editor, value: "st -e {{ default_editor }} %1" }
+      - section: Theme
+        options:
+          - { key: style_main_window, value: "true" }
+          - { key: bg, value: "{{ theme.base }}" }
+          - { key: fg, value: "{{ theme.text }}" }
+          - { key: alt_bg, value: "{{ theme.mantle }}" }
+          - { key: sel_bg, value: "{{ theme.surface1 }}" }
+          - { key: sel_fg, value: "{{ theme.text }}" }
+          - { key: find_bg, value: "{{ theme.accent }}" }
+          - { key: find_fg, value: "{{ theme.crust }}" }
+          - { key: edit_bg, value: "{{ theme.surface0 }}" }
+          - { key: edit_fg, value: "{{ theme.text }}" }
+          - { key: notes_bg, value: "{{ theme.surface0 }}" }
+          - { key: notes_fg, value: "{{ theme.subtext }}" }
+          - { key: num_fg, value: "{{ theme.overlay }}" }
+          - { key: font, value: '"{{ copyq_font }}"' }
+          - { key: edit_font, value: '"{{ copyq_font }}"' }
+          - { key: find_font, value: '"{{ copyq_font }}"' }
+          - { key: notes_font, value: '"{{ copyq_font }}"' }
+          - { key: show_scrollbars, value: "false" }
+  notify: restart copyq

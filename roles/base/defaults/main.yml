@@ -86,6 +86,8 @@ essential_packages:
   - python3-venv
   # Screenshots
   - flameshot
+  # Clipboard history
+  - copyq
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -293,6 +295,9 @@ lazyvim_extras:
 
 # Screenshots (flameshot)
 screenshot_path: "{{ user_home_path }}/Pictures/Screenshots"
+
+# Clipboard history (CopyQ)
+copyq_max_items: 500
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

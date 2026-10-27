@@ -48,3 +48,16 @@
   environment:
     DISPLAY: ":0"
   failed_when: false
+
+# CopyQ reads its theme only when it starts. Start it again if it runs.
+- name: restart copyq
+  shell: |
+    pgrep -x -u "$(id -u)" copyq >/dev/null || exit 0
+    copyq exit
+    sleep 1
+    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus" setsid -f copyq --start-server >/dev/null 2>&1 </dev/null
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    DISPLAY: ":0"
+  failed_when: false
