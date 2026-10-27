@@ -419,7 +419,7 @@
     group: "{{ group }}"
     mode: 0644
 
-# Bash (history, fzf and the editor)
+# Bash (history, fzf, the editor and the developer tools)
 # Debian calls bat "batcat" and fd "fdfind". fzf, LazyVim and you use the usual names.
 - name: Bash - link bat and fd to their Debian names
   file:
@@ -430,7 +430,7 @@
     - { src: batcat, dest: bat }
     - { src: fdfind, dest: fd }
 
-- name: Bash - configure history and fzf
+- name: Bash - configure history, fzf and the developer tools
   template:
     src: bashrc.j2
     dest: "{{ user_config_path }}/bash/bashrc"
@@ -450,19 +450,36 @@
     - HISTSIZE
     - HISTFILESIZE
 
-# fzf lines that were added by hand before the playbook managed fzf
-- name: Bash - remove the old fzf lines from ~/.bashrc
+# Lines that were added by hand to ~/.bashrc (and by the installers of the
+# tools). ~/.config/bash/bashrc sets them now.
+- name: Bash - remove the old hand-added lines from ~/.bashrc
   lineinfile:
     path: "{{ user_home_path }}/.bashrc"
-    regexp: '^(source|\.) /usr/share/doc/fzf/examples/|^export FZF_'
+    regexp: "{{ item }}"
     state: absent
+  loop:
+    # fzf
+    - '^(source|\.) /usr/share/doc/fzf/examples/|^export FZF_'
+    # nvm
+    - '^export NVM_DIR="\$HOME/\.nvm"$'
+    - '^\[ -s "\$NVM_DIR/(nvm\.sh|bash_completion)" \]'
+    # pyenv and pyenv-virtualenv, with the comments of the installer
+    - '^export PYENV_ROOT="\$HOME/\.pyenv"$'
+    - '^\[\[ -d \$PYENV_ROOT/bin \]\]'
+    - '^eval "\$\(pyenv (init - bash|virtualenv-init -)\)"$'
+    - '^# (Restart your shell for the changes to take effect\.|Load pyenv-virtualenv automatically by adding|the following to ~/\.bashrc:)$'
+    # Pulumi
+    - '^# add Pulumi to the PATH$'
+    - '^export PATH=\$PATH:.*/\.pulumi/bin$'
+    # uv and Rust
+    - '^\. "\$HOME/\.(local/bin|cargo)/env"$'
 
 - name: Bash - load ~/.config/bash/bashrc from ~/.bashrc
   blockinfile:
     path: "{{ user_home_path }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (personal-debian-playbook)"
     block: |
-      # History, fzf and the editor. Edit roles/base/templates/bashrc.j2.
+      # History, fzf, the editor and the developer tools. Edit roles/base/templates/bashrc.j2.
       [ -f ~/.config/bash/bashrc ] && . ~/.config/bash/bashrc
     owner: "{{ user }}"
     group: "{{ group }}"

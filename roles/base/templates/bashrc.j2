@@ -25,6 +25,34 @@ if [[ ";${PROMPT_COMMAND:-};" != *";history -a;"* ]]; then
     PROMPT_COMMAND="history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
 
+# Window title: user@host: directory. The tabs layout of xmonad shows it.
+# ~/.bashrc of Debian sets the title only in xterm and rxvt.
+if [[ $TERM == st* && $PS1 != *'\e]0;'* ]]; then
+    PS1="\[\e]0;\u@\h: \w\a\]$PS1"
+fi
+
+# Developer tools that you install by hand, not with this playbook. Each tool
+# loads only when it is installed.
+# nvm: Node.js versions
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+
+# pyenv: Python versions, with the pyenv-virtualenv plugin
+export PYENV_ROOT="$HOME/.pyenv"
+[ -d "$PYENV_ROOT/bin" ] && export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv >/dev/null; then
+    eval "$(pyenv init - bash)"
+    [ -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ] && eval "$(pyenv virtualenv-init -)"
+fi
+
+# Pulumi
+[ -d "$HOME/.pulumi/bin" ] && export PATH="$PATH:$HOME/.pulumi/bin"
+
+# uv (~/.local/bin) and Rust (~/.cargo/bin)
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
 # Fuzzy finder (fzf)
 #   Ctrl+R      search the history of all terminals
 #   Ctrl+T      insert a file path

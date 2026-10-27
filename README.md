@@ -135,8 +135,17 @@ does not lose its commands.
 | `Alt + C`     | Go to a directory                                        |
 | `** + Tab`    | Complete paths, ssh hosts and processes (`ssh **`, `kill **`) |
 
+The window title of st is `user@host: directory`, so each tab of the tabs
+layout shows its directory.
+
+`~/.config/bash/bashrc` also loads the developer tools that you install by hand:
+nvm, pyenv (with pyenv-virtualenv), Pulumi, uv and Rust. Each tool loads only
+when it is installed.
+
 The playbook adds one block to the end of `~/.bashrc` that reads
-`~/.config/bash/bashrc`. Your other lines in `~/.bashrc` stay.
+`~/.config/bash/bashrc`. It removes the lines of fzf and of the developer tools
+from `~/.bashrc`, because the block loads them now. Your other lines in
+`~/.bashrc` stay.
 
 ### Neovim (LazyVim)
 
