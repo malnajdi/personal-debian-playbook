@@ -17,9 +17,14 @@
     DISPLAY: ":0"
   failed_when: false
 
-# Picom reads its configuration again when it gets SIGUSR1
-- name: reload picom
-  command: pkill -USR1 -x -u {{ user }} picom
+# Start picom again with the new configuration. picom 12 can stop when it gets
+# SIGUSR1 (the old way to reload), so stop it and start it.
+- name: restart picom
+  shell: pkill -x -u {{ user }} picom; sleep 1; picom -b
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    DISPLAY: ":0"
   failed_when: false
 
 # D-Bus starts dunst again with the new configuration at the next notification
