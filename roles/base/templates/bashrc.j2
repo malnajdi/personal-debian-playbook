@@ -1,7 +1,11 @@
 # Managed by Ansible. Edit roles/base/templates/bashrc.j2 instead.
 # ~/.bashrc reads this file at the end.
 
-# Only for interactive shells
+# Editor
+export EDITOR={{ default_editor }}
+export VISUAL={{ default_editor }}
+
+# The rest is only for interactive shells
 [[ $- == *i* ]] || return
 
 # History

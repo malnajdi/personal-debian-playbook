@@ -80,6 +80,10 @@ essential_packages:
   - fd-find
   - bat
   - ripgrep
+  # Neovim (LazyVim): git tool, archives and Python tools for Mason
+  - lazygit
+  - unzip
+  - python3-venv
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -132,6 +136,7 @@ theme_palettes:
     vscode_extension: Catppuccin.catppuccin-vsc
     vscode_theme: Catppuccin Mocha
     icon_theme: Papirus-Dark
+    nvim_colorscheme: catppuccin-mocha
     crust: "#11111b"
     mantle: "#181825"
     base: "#1e1e2e"
@@ -173,6 +178,7 @@ theme_palettes:
     vscode_extension: enkia.tokyo-night
     vscode_theme: Tokyo Night
     icon_theme: Papirus-Dark
+    nvim_colorscheme: tokyonight-night
     crust: "#15161e"
     mantle: "#16161e"
     base: "#1a1b26"
@@ -261,6 +267,27 @@ bash_history_ignore:
   - clear
   - exit
   - history
+
+# Default editor: EDITOR, VISUAL and the "editor" command.
+# Use /bin/nano for nano.
+default_editor: /usr/local/bin/nvim
+
+# Neovim and LazyVim
+# Debian 13 has Neovim 0.10 and tree-sitter 0.22. LazyVim needs newer ones,
+# so the playbook installs these releases from GitHub.
+neovim_version: v0.12.6
+tree_sitter_version: v0.27.1
+# LazyVim extras: https://www.lazyvim.org/extras
+lazyvim_extras:
+  - lang.python
+  - lang.typescript
+  - lang.go
+  - lang.json
+  - lang.yaml
+  - lang.markdown
+  - lang.docker
+  - lang.ansible
+  # - lang.php
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

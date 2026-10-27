@@ -121,6 +121,7 @@
   loop:
     - /etc/lightdm/lightdm.conf.d
     - /usr/share/backgrounds
+    - /usr/local/share/applications
 
 # Remove files from the old setup (compton, old xmobar configs, polkit pkla)
 - name: Remove replaced configuration files
@@ -418,7 +419,7 @@
     group: "{{ group }}"
     mode: 0644
 
-# Bash (history and fzf)
+# Bash (history, fzf and the editor)
 # Debian calls bat "batcat" and fd "fdfind". fzf, LazyVim and you use the usual names.
 - name: Bash - link bat and fd to their Debian names
   file:
@@ -461,7 +462,7 @@
     path: "{{ user_home_path }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (personal-debian-playbook)"
     block: |
-      # History and fzf. Edit roles/base/templates/bashrc.j2.
+      # History, fzf and the editor. Edit roles/base/templates/bashrc.j2.
       [ -f ~/.config/bash/bashrc ] && . ~/.config/bash/bashrc
     owner: "{{ user }}"
     group: "{{ group }}"
@@ -543,11 +544,6 @@
     group: "{{ group }}"
     mode: 0644
 
-- name: Set nano as default editor
-  alternatives:
-    name: editor
-    path: /bin/nano
-
 # GIT
 - name: Configure git
   template:
@@ -556,3 +552,76 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
+
+# Neovim and LazyVim
+- name: Neovim - create the install directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - "/opt/neovim/{{ neovim_version }}"
+    - "/opt/tree-sitter/{{ tree_sitter_version }}"
+
+- name: Neovim - install
+  unarchive:
+    src: "https://github.com/neovim/neovim/releases/download/{{ neovim_version }}/nvim-linux-x86_64.tar.gz"
+    dest: "/opt/neovim/{{ neovim_version }}"
+    remote_src: yes
+    creates: "/opt/neovim/{{ neovim_version }}/nvim-linux-x86_64/bin/nvim"
+
+# nvim-treesitter builds the language parsers with the tree-sitter CLI
+- name: Neovim - install the tree-sitter CLI
+  unarchive:
+    src: "https://github.com/tree-sitter/tree-sitter/releases/download/{{ tree_sitter_version }}/tree-sitter-cli-linux-x64.zip"
+    dest: "/opt/tree-sitter/{{ tree_sitter_version }}"
+    remote_src: yes
+    creates: "/opt/tree-sitter/{{ tree_sitter_version }}/tree-sitter"
+
+# The menu entry opens Neovim in the terminal of rofi (st)
+- name: Neovim - link the programs and the menu entry
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+    force: yes
+  loop:
+    - src: "/opt/neovim/{{ neovim_version }}/nvim-linux-x86_64/bin/nvim"
+      dest: /usr/local/bin/nvim
+    - src: "/opt/neovim/{{ neovim_version }}/nvim-linux-x86_64/share/applications/nvim.desktop"
+      dest: /usr/local/share/applications/nvim.desktop
+    - src: "/opt/tree-sitter/{{ tree_sitter_version }}/tree-sitter"
+      dest: /usr/local/bin/tree-sitter
+
+- name: LazyVim - configure
+  template:
+    src: "nvim/{{ item }}.j2"
+    dest: "{{ user_config_path }}/nvim/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop:
+    - init.lua
+    - lua/config/lazy.lua
+    - lua/config/options.lua
+    - lua/config/keymaps.lua
+    - lua/config/autocmds.lua
+    - lua/plugins/theme.lua
+  register: lazyvim_configured
+
+# Install the plugins now, so the first start of nvim is fast.
+# Mason installs the language servers when nvim starts the first time.
+- name: LazyVim - install the plugins
+  command: nvim --headless "+Lazy! install" +qa
+  become: true
+  become_user: "{{ user }}"
+  when: lazyvim_configured.changed
+
+# EDITOR and VISUAL are in ~/.config/bash/bashrc. This is for programs that
+# run the "editor" command.
+- name: Set the default editor
+  alternatives:
+    name: editor
+    path: "{{ default_editor }}"

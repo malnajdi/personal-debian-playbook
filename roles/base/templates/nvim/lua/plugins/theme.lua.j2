@@ -1,0 +1,11 @@
+-- Managed by Ansible. Edit roles/base/templates/nvim/lua/plugins/theme.lua.j2 instead.
+-- The same color palette as the desktop ({{ theme_name }}).
+-- LazyVim includes the catppuccin and tokyonight color schemes.
+return {
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "{{ theme.nvim_colorscheme }}",
+    },
+  },
+}
