@@ -53,6 +53,7 @@ import qualified XMonad.Layout.MultiToggle as MT (Toggle(..))
     -- Utilities
 import XMonad.Util.ClickableWorkspaces (clickablePP)
 import XMonad.Util.EZConfig (additionalKeysP)
+import XMonad.Util.Image (Placement(OffsetLeft))
 import XMonad.Util.Loggers
 import XMonad.Util.SpawnOnce
 
@@ -321,18 +322,25 @@ tabs     = renamed [Replace "tabs"]
            $ tabbed shrinkText myTabConfig
   where
     g = 2 * myGap
+    -- The tabs have the background color of the window, so the tabs and the
+    -- window look like one window. The active tab has an accent text and underline.
     myTabConfig = def { fontName            = myFont
-                      , activeColor         = colorAccent
-                      , inactiveColor       = colorSurface0
-                      , urgentColor         = colorRed
-                      , activeBorderColor   = colorAccent
-                      , inactiveBorderColor = colorSurface0
-                      , urgentBorderColor   = colorRed
-                      , activeTextColor     = colorCrust
-                      , inactiveTextColor   = colorText
-                      , urgentTextColor     = colorCrust
-                      , decoHeight          = 28
+                      , activeColor         = colorBase
+                      , inactiveColor       = colorBase
+                      , urgentColor         = colorBase
+                      , activeBorderWidth   = 0
+                      , inactiveBorderWidth = 0
+                      , urgentBorderWidth   = 0
+                      , activeTextColor     = colorAccent
+                      , inactiveTextColor   = colorOverlay
+                      , urgentTextColor     = colorRed
+                      , decoHeight          = tabHeight
+                      , windowTitleIcons    = [(underline, OffsetLeft 0 (fromIntegral tabHeight - 2))]
                       }
+    tabHeight = 28
+    -- A line of 2 pixels at the bottom of each tab, in the text color of the tab.
+    -- It is wider than any screen; the tab cuts it to its own width.
+    underline = replicate 2 (replicate 4000 True)
 
 -- Big workspace name in the middle of the screen after a workspace change
 mySWNConfig :: SWNConfig
@@ -365,11 +373,11 @@ myStatusBar s@(S n) = statusBarPipe command (clickablePP (myPP s))
 
 myPP :: ScreenId -> PP
 myPP s = def
-    { ppCurrent         = pill colorCrust colorAccent                          -- Focused workspace
-    , ppVisible         = xmobarBorder "Bottom" colorAccent 2 . xmobarColor colorAccent ""  -- Workspace on an other screen
+    { ppCurrent         = underlined colorAccent . xmobarColor colorAccent ""     -- Focused workspace
+    , ppVisible         = underlined colorOverlay . xmobarColor colorText ""      -- Workspace on an other screen
     , ppHidden          = xmobarColor colorText ""                             -- Workspaces with windows
     , ppHiddenNoWindows = xmobarColor colorSurface2 ""                         -- Empty workspaces
-    , ppUrgent          = pill colorCrust colorRed                             -- Urgent workspace
+    , ppUrgent          = underlined colorRed . xmobarColor colorRed ""           -- Urgent workspace
     , ppRename          = \ws _ -> workspaceIcon ws ++ " " ++ ws
     , ppWsSep           = " "
     , ppSep             = "  "
@@ -377,9 +385,8 @@ myPP s = def
     , ppExtras          = [layoutLogger s]
     }
   where
-    -- Solid color behind the text, from the top to the bottom of the bar.
-    -- A space on each side, so the text does not touch the edge of the color.
-    pill fg bg = wrap ("<fc=" ++ fg ++ "," ++ bg ++ ":0>") "</fc>" . wrap " " " "
+    -- A line of 3 pixels at the bottom of the bar, under the text
+    underlined color = xmobarBorder "Bottom" color 3
 
 -- Layout icon and name. Click it to change the layout.
 layoutLogger :: ScreenId -> Logger
