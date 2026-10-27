@@ -178,6 +178,13 @@
     group: "{{ group }}"
   when: not st_installed.stat.exists
 
+# Fixes for Neovim 0.12. See the patch file.
+- name: Patch suckless terminal (st)
+  patch:
+    src: st-0.8.2-neovim.patch
+    basedir: "{{ user_config_path }}/st-0.8.2"
+  register: st_patched
+
 - name: Configure suckless terminal (st)
   template:
     src: st_config.h.j2
@@ -190,7 +197,7 @@
   command: make clean install
   args:
     chdir: "{{ user_config_path }}/st-0.8.2/"
-  when: st_configured.changed or not st_installed.stat.exists
+  when: st_configured.changed or st_patched.changed or not st_installed.stat.exists
 
 # Rofi (application launcher and menus)
 - name: Configure rofi
