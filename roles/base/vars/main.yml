@@ -18,6 +18,7 @@ directories:
   - "{{ user_config_path }}/gtk-4.0"
   - "{{ user_config_path }}/nano"
   - "{{ user_config_path }}/Code/User"
+  - "{{ user_config_path }}/bash"
   - "{{ user_home_path }}/.xmonad"
   - "{{ user_home_path }}/projects/work"
   - "{{ user_home_path }}/projects/web"

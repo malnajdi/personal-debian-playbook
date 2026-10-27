@@ -75,7 +75,11 @@ essential_packages:
   - steam
   - ffmpegthumbnailer
   - tumbler
+  # Shell: fuzzy finder and the programs it uses
   - fzf
+  - fd-find
+  - bat
+  - ripgrep
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -245,6 +249,18 @@ picom_opacity_apps:
     opacity: 97
   - name: steam
     opacity: 100
+
+# Shell (bash)
+# Commands that bash keeps in memory. Ctrl+R searches them.
+bash_history_size: 100000
+# Commands that bash does not keep (exact match)
+bash_history_ignore:
+  - ls
+  - cd
+  - pwd
+  - clear
+  - exit
+  - history
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

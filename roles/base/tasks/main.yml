@@ -411,6 +411,55 @@
     group: "{{ group }}"
     mode: 0644
 
+# Bash (history and fzf)
+# Debian calls bat "batcat" and fd "fdfind". fzf, LazyVim and you use the usual names.
+- name: Bash - link bat and fd to their Debian names
+  file:
+    src: "/usr/bin/{{ item.src }}"
+    dest: "/usr/local/bin/{{ item.dest }}"
+    state: link
+  loop:
+    - { src: batcat, dest: bat }
+    - { src: fdfind, dest: fd }
+
+- name: Bash - configure history and fzf
+  template:
+    src: bashrc.j2
+    dest: "{{ user_config_path }}/bash/bashrc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+
+# ~/.bashrc of Debian sets HISTFILESIZE=2000, and bash cuts the history file
+# to 2000 lines at that line. ~/.config/bash/bashrc sets the history size.
+- name: Bash - remove the history size from ~/.bashrc
+  lineinfile:
+    path: "{{ user_home_path }}/.bashrc"
+    regexp: '^({{ item }}=.*)$'
+    line: '# \1  (set in ~/.config/bash/bashrc)'
+    backrefs: yes
+  loop:
+    - HISTSIZE
+    - HISTFILESIZE
+
+# fzf lines that were added by hand before the playbook managed fzf
+- name: Bash - remove the old fzf lines from ~/.bashrc
+  lineinfile:
+    path: "{{ user_home_path }}/.bashrc"
+    regexp: '^(source|\.) /usr/share/doc/fzf/examples/|^export FZF_'
+    state: absent
+
+- name: Bash - load ~/.config/bash/bashrc from ~/.bashrc
+  blockinfile:
+    path: "{{ user_home_path }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (personal-debian-playbook)"
+    block: |
+      # History and fzf. Edit roles/base/templates/bashrc.j2.
+      [ -f ~/.config/bash/bashrc ] && . ~/.config/bash/bashrc
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    create: yes
+
 # Polkit reads the rules again when a file changes. A restart is not necessary.
 - name: Configure polkit rules
   template:

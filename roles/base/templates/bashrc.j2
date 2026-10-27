@@ -1,0 +1,58 @@
+# Managed by Ansible. Edit roles/base/templates/bashrc.j2 instead.
+# ~/.bashrc reads this file at the end.
+
+# Only for interactive shells
+[[ $- == *i* ]] || return
+
+# History
+# Bash cuts the history file each time HISTFILESIZE gets a number, so
+# ~/.bashrc must not set it. -1 keeps all the commands in the file.
+HISTSIZE={{ bash_history_size }}
+HISTFILESIZE=-1
+HISTCONTROL=ignoreboth
+HISTIGNORE='{{ bash_history_ignore | join(':') }}'
+HISTTIMEFORMAT='%F %T  '
+shopt -s histappend
+
+# Write each command to the history file when it ends, not when the terminal
+# closes. A killed terminal does not lose its commands, and new terminals
+# see the commands of all terminals.
+if [[ ";${PROMPT_COMMAND:-};" != *";history -a;"* ]]; then
+    PROMPT_COMMAND="history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+fi
+
+# Fuzzy finder (fzf)
+#   Ctrl+R      search the history of all terminals
+#   Ctrl+T      insert a file path
+#   Alt+C       go to a directory
+#   ** + Tab    complete paths, ssh hosts, process IDs (kill **) and more
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS="--height=50% --layout=reverse --border=rounded --info=inline-right \
+--color=bg+:{{ theme.surface0 }},bg:{{ theme.base }},spinner:{{ theme.cursor }},hl:{{ theme.red }} \
+--color=fg:{{ theme.text }},header:{{ theme.red }},info:{{ theme.accent }},pointer:{{ theme.cursor }} \
+--color=marker:{{ theme.accent }},fg+:{{ theme.text }},prompt:{{ theme.accent }},hl+:{{ theme.red }} \
+--color=selected-bg:{{ theme.surface1 }},border:{{ theme.overlay }},label:{{ theme.text }}"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range=:200 {}'"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --color=always --icons {} | head -200'"
+# bat uses the 16 terminal colors, so it follows the theme
+export BAT_THEME=base16
+
+# ** + Tab finds files and directories with fd
+_fzf_compgen_path() { fd --hidden --follow --exclude .git . "$1"; }
+_fzf_compgen_dir() { fd --type d --hidden --follow --exclude .git . "$1"; }
+
+eval "$(fzf --bash)"
+
+# Ctrl+R reads the history file again before the search, so it also finds
+# the commands of the terminals that are open now.
+__fzf_history_all__() {
+    history -a
+    history -c
+    history -r
+    __fzf_history__
+}
+bind -m emacs-standard -x '"\C-r": __fzf_history_all__'
+bind -m vi-command -x '"\C-r": __fzf_history_all__'
+bind -m vi-insert -x '"\C-r": __fzf_history_all__'
