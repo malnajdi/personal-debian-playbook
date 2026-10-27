@@ -471,7 +471,8 @@
 
 - name: Install vscode extentions
   command: 'snap run code --install-extension {{ item }}'
-  loop: "{{ vscode_extentions }}"
+  # The extensions in the list, and the theme of the palette (theme_name)
+  loop: "{{ vscode_extentions + [theme.vscode_extension] }}"
   become: true
   become_user: "{{ user }}"
   when: vscode_installed.stat.exists

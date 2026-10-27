@@ -125,6 +125,8 @@ theme_name: catppuccin_mocha
 theme_palettes:
   catppuccin_mocha:
     gtk_theme: Adwaita-dark
+    vscode_extension: Catppuccin.catppuccin-vsc
+    vscode_theme: Catppuccin Mocha
     icon_theme: Papirus-Dark
     crust: "#11111b"
     mantle: "#181825"
@@ -164,6 +166,8 @@ theme_palettes:
       - "#a6adc8"
   tokyo_night:
     gtk_theme: Adwaita-dark
+    vscode_extension: enkia.tokyo-night
+    vscode_theme: Tokyo Night
     icon_theme: Papirus-Dark
     crust: "#15161e"
     mantle: "#16161e"

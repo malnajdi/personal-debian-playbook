@@ -1,5 +1,22 @@
 {
-    "workbench.colorTheme": "Default Dark+",
+    // The VSCode theme of the palette (theme_name), with the accent color of the desktop
+    "workbench.colorTheme": "{{ theme.vscode_theme }}",
+    "workbench.colorCustomizations": {
+        "[{{ theme.vscode_theme }}]": {
+            "focusBorder": "{{ theme.accent }}",
+            "activityBar.activeBorder": "{{ theme.accent }}",
+            "activityBarBadge.background": "{{ theme.accent }}",
+            "activityBarBadge.foreground": "{{ theme.crust }}",
+            "tab.activeBorder": "{{ theme.accent }}",
+            "panelTitle.activeBorder": "{{ theme.accent }}",
+            "statusBarItem.remoteBackground": "{{ theme.accent }}",
+            "statusBarItem.remoteForeground": "{{ theme.crust }}",
+            "button.background": "{{ theme.accent }}",
+            "button.foreground": "{{ theme.crust }}",
+            "progressBar.background": "{{ theme.accent }}",
+            "editorCursor.foreground": "{{ theme.cursor }}"
+        }
+    },
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter-notebook"
     },
