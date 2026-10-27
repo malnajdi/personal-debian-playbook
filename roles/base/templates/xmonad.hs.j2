@@ -108,6 +108,7 @@ myStartupHook = do
           -- Set the monitor layout first, then the wallpaper on each monitor
           spawnOnce "[ -f ~/.screenlayout/screen.sh ] && sh ~/.screenlayout/screen.sh; nitrogen --restore"
           spawnOnce "xsetroot -cursor_name left_ptr"
+          spawnOnce "flameshot"               -- Screenshots (no tray icon)
           -- picom starts from ~/.xsessionrc, before xmonad and the bars
 
 ------------------------------------------------------------------------
@@ -247,6 +248,13 @@ myKeys =
         , ("M1-C-<Return>", spawn "rofi -show run")                           -- Commands
         , ("M1-C-p", spawn "{{ user_config_path }}/alias_dmenu.sh")           -- Bash aliases
 
+    --- Screenshots (flameshot)
+    --- A copy to the clipboard also saves the file in {{ screenshot_path }}
+        , ("<Print>", spawn "flameshot gui")                                  -- Select an area, draw, then copy (Enter) or save
+        , ("M-<Print>", spawn "flameshot gui --delay 3000")                   -- The same, after 3 seconds (for menus)
+        , ("S-<Print>", spawn "flameshot screen --clipboard")                 -- This monitor
+        , ("C-<Print>", spawn "flameshot full --clipboard")                   -- All monitors
+
     --- My Applications (Super+Alt+Key)
         --, ("M-M1-a", spawn (myTerminal ++ " -e ncpamixer"))
 
@@ -291,6 +299,7 @@ myManageHook = composeAll
      , classIs ["gimp", "gimp-2.10", "gimp-3.0"]          --> doShift "draw"
      , classIs ["code"]                                   --> doShift "dev"
      , classIs ["pavucontrol", "org.pulseaudio.pavucontrol"] --> doCenterFloat
+     , classIs ["flameshot"]                              --> doFloat   -- Pinned screenshots and settings
      , isDialog                                           --> doCenterFloat
      ]
 

@@ -72,6 +72,11 @@ rules = (
   # Full screen windows (videos, games, lock screen)
   { match = "fullscreen"; corner-radius = 0; shadow = false; dim = 0; },
 
+  # Screenshot tool: no effects and no animation, so the screen does not change
+  # when you start a screenshot
+  { match = "class_g = 'flameshot'"; corner-radius = 0; shadow = false; dim = 0; fade = false; blur-background = false;
+    animations = ({ triggers = [ "open", "close" ]; }); },
+
   # Transparent applications
 {% for app in picom_opacity_apps %}
   { match = "class_g = '{{ app.name }}'"; opacity = {{ app.opacity / 100 }}; },

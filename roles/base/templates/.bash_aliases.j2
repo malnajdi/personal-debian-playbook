@@ -4,5 +4,5 @@ alias activate-headset='pactl set-default-sink alsa_output.usb-Kingston_HyperX_7
 alias activate-stereo='pactl set-default-sink alsa_output.pci-0000_00_1f.3.analog-stereo'
 alias screenkey='screenkey -p bottom -s small --scr 1 -t 0.4 --vis-shift'
 alias grep='grep --color'
-alias screenshot='import `date +%Y-%m-%d`.png'
-alias xscreenshot='import png:- | xclip -selection clipboard -t image/png -i'
+alias screenshot='flameshot full --path {{ screenshot_path }}'
+alias xscreenshot='flameshot full --clipboard'

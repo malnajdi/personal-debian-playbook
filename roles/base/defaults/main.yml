@@ -84,6 +84,8 @@ essential_packages:
   - lazygit
   - unzip
   - python3-venv
+  # Screenshots
+  - flameshot
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -288,6 +290,9 @@ lazyvim_extras:
   - lang.docker
   - lang.ansible
   # - lang.php
+
+# Screenshots (flameshot)
+screenshot_path: "{{ user_home_path }}/Pictures/Screenshots"
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

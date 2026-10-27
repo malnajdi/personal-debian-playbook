@@ -625,3 +625,33 @@
   alternatives:
     name: editor
     path: "{{ default_editor }}"
+
+# Screenshots (flameshot)
+# flameshot writes its own settings to this file too, so set only these keys.
+- name: Configure flameshot
+  ini_file:
+    path: "{{ user_config_path }}/flameshot/flameshot.ini"
+    section: General
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: yes
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop: "{{ settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  vars:
+    settings:
+      savePath: "{{ screenshot_path }}"
+      savePathFixed: "true"
+      filenamePattern: "%F_%H-%M-%S"
+      # Enter (copy) also saves the screenshot to the folder
+      saveAfterCopy: "true"
+      # xmobar has no tray
+      disabledTrayIcon: "true"
+      showStartupLaunchMessage: "false"
+      checkForUpdates: "false"
+      uiColor: "{{ theme.accent }}"
+      contrastUiColor: "{{ theme.base }}"
+      userColors: "picker, {{ [theme.red, theme.orange, theme.yellow, theme.green, theme.blue, theme.accent, theme.text, theme.crust] | join(', ') }}"
