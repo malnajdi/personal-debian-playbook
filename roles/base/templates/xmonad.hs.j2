@@ -27,6 +27,7 @@ import Data.Maybe (catMaybes, fromMaybe)
 
     -- Hooks
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhFullscreen)
+import XMonad.Hooks.InsertPosition (insertPosition, Focus(Newer), Position(End))
 import XMonad.Hooks.ManageDocks (avoidStruts, docks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
 import XMonad.Hooks.StatusBar
@@ -465,7 +466,10 @@ main = do
      . docks
      . dynamicSBs myStatusBar
      $ def
-        { manageHook         = ( isFullscreen --> doFullFloat ) <+> myManageHook
+        -- New windows go to the end of the stack (on the right in "tall").
+        -- insertPosition must be the first hook, so it also places the windows
+        -- that other hooks move to an other workspace.
+        { manageHook         = insertPosition End Newer <+> ( isFullscreen --> doFullFloat ) <+> myManageHook
         , modMask            = myModMask
         , terminal           = myTerminal
         , startupHook        = myStartupHook
