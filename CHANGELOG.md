@@ -17,6 +17,11 @@
 * JetBrainsMono Nerd Font is installed from the Nerd Fonts release.
 * Wi-Fi and Bluetooth in the bar with rofi menus (connect, pair, on/off), when the device has the hardware.
 * VSCode uses the theme of the palette (Catppuccin Mocha or Tokyo Night) with the accent color of the desktop.
+* The playbook manages the bash history and fzf: all the history is kept, Ctrl+R searches the history of all open terminals, and fzf uses the theme colors.
+* Neovim 0.12 with LazyVim. The color scheme follows the theme, and Neovim is the default editor.
+* New windows open on the right (at the end of the stack), not as the main window on the left.
+* flameshot for screenshots: `Print` keys, files in `~/Pictures/Screenshots`, theme colors.
+* CopyQ clipboard history with text and images: `Super + V`.
 
 ### Fixes
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).
@@ -32,3 +37,8 @@
 * The bar shows the window title without xmobar tags from the title.
 * The st font is 15 px (was 20 px), the same size as the rest of the desktop.
 * VSCode settings are installed as `settings.json` (VSCode did not read `vscode.json`), and zen mode does not make the window full screen.
+* bash cut the history file to 2000 lines each time a terminal opened (`HISTFILESIZE` in `~/.bashrc`).
+* fzf `Alt+C` used `fd`, but Debian calls it `fdfind`.
+* st stopped to decode UTF-8 after a DCS string (st 0.8.2 bug), and did not answer the status report request. Neovim 0.12 showed "â" and the error E1568.
+* The `screenshot` alias saved one file each day in the current directory, and a second screenshot on the same day replaced the first.
+* rofi opens terminal applications in st.

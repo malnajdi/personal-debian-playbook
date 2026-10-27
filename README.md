@@ -35,7 +35,11 @@ You can run the playbook again at any time. It only changes what is different.
 | Compositor    | picom    | `picom.conf.j2`                              |
 | Menus         | rofi     | `rofi.rasi.j2`, `powermenu.sh.j2`, `alias_dmenu.sh.j2` |
 | Notifications | dunst    | `dunstrc.j2`                                 |
-| Terminal      | st       | `st_config.h.j2`                             |
+| Terminal      | st       | `st_config.h.j2`, `files/st-0.8.2-neovim.patch` |
+| Shell         | bash, fzf | `bashrc.j2`, `.bash_aliases.j2`             |
+| Editor        | Neovim, LazyVim | `nvim/`                               |
+| Screenshots   | flameshot | `roles/base/tasks/main.yml` ("Configure flameshot") |
+| Clipboard     | CopyQ    | `roles/base/tasks/main.yml` ("Configure CopyQ") |
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 
@@ -69,6 +73,12 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `bar_alpha`                  | `235`              | Bar transparency (0 to 255)                   |
 | `picom_backend`              | `glx`              | Use `egl` or `xrender` if the screen does not update |
 | `picom_animations`           | `true`             | Animations when windows open and close        |
+| `bash_history_size`          | `100000`           | Commands in the history that Ctrl+R searches  |
+| `default_editor`             | `/usr/local/bin/nvim` | Editor for git, crontab, sudoedit. Use `/bin/nano` for nano |
+| `neovim_version`             | `v0.12.6`          | Neovim release from GitHub                    |
+| `lazyvim_extras`             | Python, TypeScript, Go, ... | LazyVim extras (languages)           |
+| `screenshot_path`            | `~/Pictures/Screenshots` | Folder for screenshots                  |
+| `copyq_max_items`            | `500`              | Items in the clipboard history                |
 
 ### Keyboard shortcuts
 
@@ -76,7 +86,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 
 | Keys                     | Action                                    |
 |--------------------------|-------------------------------------------|
-| `Super + Enter`          | Open a terminal                           |
+| `Super + Enter`          | Open a terminal (new windows open on the right) |
 | `Super + P`              | Open the application launcher             |
 | `Alt + Ctrl + Enter`     | Run a command                             |
 | `Alt + Ctrl + P`         | Run a bash alias                          |
@@ -96,6 +106,11 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `Super + Shift + X`      | Power menu                                |
 | `Super + Shift + S`      | Apply the monitor layout                  |
 | `Super + Shift + R`      | Restart xmonad                            |
+| `Print`                  | Screenshot: select an area, draw, then copy (`Enter`) or save (`Ctrl + S`) |
+| `Super + Print`          | The same, after 3 seconds (to capture a menu) |
+| `Shift + Print`          | Screenshot of this monitor                |
+| `Ctrl + Print`           | Screenshot of all monitors                |
+| `Super + V`              | Clipboard history                         |
 
 You can also click the bar: workspaces, the layout name, the Debian logo (launcher),
 Wi-Fi and Bluetooth (click: menu, right click: on/off), the volume (click: mixer,
@@ -106,6 +121,49 @@ playbook then installs NetworkManager (`network-manager`) and BlueZ (`bluez`).
 The Wi-Fi menu lists the networks and asks for the password of a new network.
 The Bluetooth menu connects paired devices, and scans for new devices to pair.
 When a keyboard needs a passkey to pair, a notification shows the passkey to type on it.
+
+### Shell
+
+The playbook keeps all the bash history in `~/.bash_history`, with the date of
+each command. Each command goes to the file when it ends, so a closed terminal
+does not lose its commands.
+
+| Keys          | Action                                                   |
+|---------------|----------------------------------------------------------|
+| `Ctrl + R`    | Search the history of all terminals (fzf)                |
+| `Ctrl + T`    | Insert a file path                                       |
+| `Alt + C`     | Go to a directory                                        |
+| `** + Tab`    | Complete paths, ssh hosts and processes (`ssh **`, `kill **`) |
+
+The playbook adds one block to the end of `~/.bashrc` that reads
+`~/.config/bash/bashrc`. Your other lines in `~/.bashrc` stay.
+
+### Neovim (LazyVim)
+
+Debian 13 has Neovim 0.10. LazyVim needs Neovim 0.11.2 or newer and the
+tree-sitter CLI 0.26 or newer, so the playbook installs them from GitHub to
+`/opt`. Run `nvim`, or open "Neovim" in the launcher.
+
+- The color scheme follows `theme_name`.
+- Yanks go to the system clipboard, so they are also in the clipboard history.
+- `:Lazy` shows the plugins, `:Mason` shows the language servers, `:LazyExtras`
+  shows the extras. Add extras to `lazyvim_extras` to keep them.
+- Edit the configuration in `roles/base/templates/nvim/`, then run the playbook.
+
+st 0.8.2 gets a small patch for Neovim 0.12 (`files/st-0.8.2-neovim.patch`).
+Without it, st shows "â" in place of lines and icons.
+
+### Screenshots
+
+flameshot saves the screenshots in `~/Pictures/Screenshots`, with the date and
+time in the file name. A copy to the clipboard also saves the file. The
+`screenshot` and `xscreenshot` aliases use flameshot too.
+
+### Clipboard
+
+CopyQ keeps the clipboard history: text and images, also after the program
+that copied them closes. Press `Super + V`, type to search, and press `Enter`
+to paste the item. `Esc` closes the window.
 
 ### Monitors
 
