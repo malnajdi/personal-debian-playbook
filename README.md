@@ -82,6 +82,11 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `screenshot_path`            | `~/Pictures/Screenshots` | Folder for screenshots                  |
 | `copyq_max_items`            | `500`              | Items in the clipboard history                |
 | `default_apps`               | nsxiv, zathura     | Default programs for file types               |
+| `uv_version`                 | `0.9.28`           | uv release from GitHub                        |
+| `pyenv_version`              | `v2.6.3`           | pyenv version (git tag)                       |
+| `pyenv_python_versions`      | `3.12.11`          | Python versions that pyenv builds             |
+| `nvm_version`                | `v0.40.3`          | nvm version (git tag)                         |
+| `nvm_node_version`           | `v24.2.0`          | Default Node.js version                       |
 
 ### Keyboard shortcuts
 
@@ -141,9 +146,9 @@ does not lose its commands.
 The window title of st is `user@host: directory`, so each tab of the tabs
 layout shows its directory.
 
-`~/.config/bash/bashrc` also loads the developer tools that you install by hand:
-nvm, pyenv (with pyenv-virtualenv), Pulumi, uv and Rust. Each tool loads only
-when it is installed.
+`~/.config/bash/bashrc` also loads the developer tools: nvm, pyenv (with
+pyenv-virtualenv) and uv, which the playbook installs, and Pulumi and Rust, which
+you install by hand. Each tool loads only when it is installed.
 
 The playbook adds one block to the end of `~/.bashrc` that reads
 `~/.config/bash/bashrc`. It removes the lines of fzf and of the developer tools
@@ -206,6 +211,20 @@ image together with the other images of its folder.
 | `q`                   | Close                                     |
 
 Text that you select in zathura goes to the clipboard.
+
+### Developer tools
+
+The playbook installs these tools in your home directory:
+
+- uv in `~/.local/bin`
+- pyenv in `~/.pyenv`, with the pyenv-virtualenv plugin and the Python versions
+  in `pyenv_python_versions`
+- nvm in `~/.nvm`, with the Node.js version in `nvm_node_version` as the default
+
+To update a tool, change its version in `roles/base/defaults/main.yml` and run
+the playbook. The playbook puts back these versions after `uv self update` or
+`pyenv update`. Programs that start from the desktop (for example Mason in
+Neovim from the launcher) also get the default Node.js version.
 
 ### Monitors
 

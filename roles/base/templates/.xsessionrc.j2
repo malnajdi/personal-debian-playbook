@@ -1,6 +1,12 @@
 # Managed by Ansible
 # Debian's Xsession reads this file before it starts xmonad.
 
+# Node.js of nvm for the programs that start from the desktop, for example
+# Mason in Neovim. Terminals load nvm in ~/.config/bash/bashrc.
+if [ -d "$HOME/.nvm/versions/node/{{ nvm_node_version }}/bin" ]; then
+    PATH="$HOME/.nvm/versions/node/{{ nvm_node_version }}/bin:$PATH"
+fi
+
 # Start the compositor first. With "-b", picom returns when it is ready, so it
 # shows the bars that xmonad starts after it. If picom starts at the same time
 # as the bars, the bars can stay black or old until their text changes.

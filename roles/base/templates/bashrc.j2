@@ -31,8 +31,8 @@ if [[ $TERM == st* && $PS1 != *'\e]0;'* ]]; then
     PS1="\[\e]0;\u@\h: \w\a\]$PS1"
 fi
 
-# Developer tools that you install by hand, not with this playbook. Each tool
-# loads only when it is installed.
+# Developer tools. The playbook installs nvm, pyenv and uv; you install Pulumi
+# and Rust by hand. Each tool loads only when it is installed.
 # nvm: Node.js versions
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"

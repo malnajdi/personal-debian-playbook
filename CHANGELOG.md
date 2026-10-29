@@ -20,6 +20,7 @@
 * The playbook manages the bash history and fzf: all the history is kept, Ctrl+R searches the history of all open terminals, and fzf uses the theme colors.
 * The playbook loads the developer tools (nvm, pyenv, Pulumi, uv, Rust) in bash when they are installed, and removes their hand-added lines from `~/.bashrc`.
 * Images open in nsxiv (with the other images of their folder) and PDFs open in zathura, with the theme colors and vim keys.
+* The playbook installs uv, pyenv (with pyenv-virtualenv and Python 3.12) and nvm (with Node.js 24). Programs that start from the desktop also get Node.js, so Mason in Neovim works from the launcher.
 * Neovim 0.12 with LazyVim. The color scheme follows the theme, and Neovim is the default editor.
 * New windows open on the right (at the end of the stack), not as the main window on the left.
 * flameshot for screenshots: `Print` keys, files in `~/Pictures/Screenshots`, theme colors.

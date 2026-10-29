@@ -94,6 +94,20 @@ essential_packages:
   - zathura-pdf-poppler
   - file
   - libglib2.0-bin
+  # pyenv: libraries to build Python
+  - libssl-dev
+  - zlib1g-dev
+  - libbz2-dev
+  - libreadline-dev
+  - libsqlite3-dev
+  - libncurses-dev
+  - libffi-dev
+  - liblzma-dev
+  - libzstd-dev
+  - libgdbm-dev
+  - libgdbm-compat-dev
+  - uuid-dev
+  - tk-dev
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -325,6 +339,24 @@ default_apps:
   - desktop: org.pwmt.zathura-pdf-poppler.desktop
     mime_types:
       - application/pdf
+
+# Developer tools in the home directory: uv (~/.local/bin), pyenv (~/.pyenv)
+# and nvm (~/.nvm). To update a tool, change its version here and run the
+# playbook. The playbook puts back these versions after "uv self update" or
+# "pyenv update".
+uv_version: 0.9.28
+pyenv_version: v2.6.3
+# Plugins from https://github.com/pyenv
+pyenv_plugins:
+  - pyenv-virtualenv
+# Python versions that pyenv builds (some minutes for each version).
+# "pyenv global" stays as you set it.
+pyenv_python_versions:
+  - 3.12.11
+nvm_version: v0.40.3
+# Node.js version (with the "v") that nvm installs and sets as the default.
+# Programs that start from the desktop use it too, for example Mason in Neovim.
+nvm_node_version: v24.2.0
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

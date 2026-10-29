@@ -771,3 +771,80 @@
   loop: "{{ default_apps | subelements('mime_types') }}"
   loop_control:
     label: "{{ item.1 }}: {{ item.0.desktop }}"
+
+# Developer tools: uv, pyenv and nvm in the home directory.
+# ~/.config/bash/bashrc loads them in the terminal.
+- name: uv - get the installed version
+  command: "{{ user_home_path }}/.local/bin/uv --version"
+  register: uv_installed
+  changed_when: false
+  failed_when: false
+
+- name: uv - install
+  unarchive:
+    src: "https://github.com/astral-sh/uv/releases/download/{{ uv_version }}/uv-x86_64-unknown-linux-gnu.tar.gz"
+    dest: "{{ user_home_path }}/.local/bin"
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+    owner: "{{ user }}"
+    group: "{{ group }}"
+  when: uv_installed.stdout | default('') is not match('uv ' ~ uv_version ~ '( |$)')
+
+- name: pyenv - install
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "{{ user_home_path }}/.pyenv"
+    version: "{{ pyenv_version }}"
+  become: true
+  become_user: "{{ user }}"
+
+# Install the plugins that are not there. Their updates come from you.
+- name: pyenv - install the plugins
+  git:
+    repo: "https://github.com/pyenv/{{ item }}.git"
+    dest: "{{ user_home_path }}/.pyenv/plugins/{{ item }}"
+    update: no
+  loop: "{{ pyenv_plugins }}"
+  become: true
+  become_user: "{{ user }}"
+
+- name: pyenv - build the Python versions
+  command: "{{ user_home_path }}/.pyenv/bin/pyenv install {{ item }}"
+  args:
+    creates: "{{ user_home_path }}/.pyenv/versions/{{ item }}/bin/python"
+  environment:
+    PYENV_ROOT: "{{ user_home_path }}/.pyenv"
+  loop: "{{ pyenv_python_versions }}"
+  become: true
+  become_user: "{{ user }}"
+
+- name: nvm - install
+  git:
+    repo: https://github.com/nvm-sh/nvm.git
+    dest: "{{ user_home_path }}/.nvm"
+    version: "{{ nvm_version }}"
+    # The only submodule is a test fixture, with an SSH URL
+    recursive: no
+  become: true
+  become_user: "{{ user }}"
+
+- name: nvm - install Node.js
+  shell: |
+    . "$NVM_DIR/nvm.sh"
+    nvm install {{ nvm_node_version }}
+  args:
+    executable: /bin/bash
+    creates: "{{ user_home_path }}/.nvm/versions/node/{{ nvm_node_version }}/bin/node"
+  environment:
+    NVM_DIR: "{{ user_home_path }}/.nvm"
+  become: true
+  become_user: "{{ user }}"
+
+# The same as "nvm alias default"
+- name: nvm - set the default Node.js version
+  copy:
+    content: "{{ nvm_node_version }}\n"
+    dest: "{{ user_home_path }}/.nvm/alias/default"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
