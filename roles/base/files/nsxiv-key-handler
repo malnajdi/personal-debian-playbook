@@ -1,0 +1,19 @@
+#!/bin/sh
+# Managed by Ansible. Edit roles/base/files/nsxiv-key-handler instead.
+# nsxiv runs this script when you press Ctrl+X and then a key. The marked
+# images (or the current image) come on stdin, one path on each line.
+
+case "$1" in
+    c)  # Copy the image to the clipboard (and to the CopyQ history)
+        read -r image
+        xclip -selection clipboard -t "$(file -b --mime-type "$image")" -i "$image"
+        ;;
+    y)  # Copy the path of the images to the clipboard
+        xclip -selection clipboard -rmlastnl
+        ;;
+    d)  # Move the images to the trash
+        while read -r image; do
+            gio trash "$image"
+        done
+        ;;
+esac

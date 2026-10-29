@@ -1,0 +1,26 @@
+#!/bin/bash
+# Managed by Ansible. Edit roles/base/files/nsxiv-browse instead.
+# Open an image in nsxiv together with the other images of its folder, so that
+# n and p (or Space and Backspace) go to the next and the previous image.
+# With more than one argument, or no file, this is the same as "nsxiv".
+
+if [ $# -ne 1 ] || [ ! -f "$1" ]; then
+    exec nsxiv -a "$@"
+fi
+
+file=$(realpath -- "$1")
+mapfile -t images < <(find "${file%/*}" -maxdepth 1 -type f \
+    -iregex '.*\.\(png\|jpe?g\|gif\|webp\|bmp\|tiff?\|avif\|heic\|heif\|jxl\|svg\)' | sort -V)
+
+n=0
+for i in "${!images[@]}"; do
+    if [ "${images[$i]}" = "$file" ]; then
+        n=$((i + 1))
+        break
+    fi
+done
+
+# The file has an other name extension: open only this file
+[ "$n" -eq 0 ] && exec nsxiv -a "$file"
+
+exec nsxiv -a -i -n "$n" < <(printf '%s\n' "${images[@]}")

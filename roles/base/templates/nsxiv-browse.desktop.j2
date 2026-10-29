@@ -1,0 +1,13 @@
+[Desktop Entry]
+# Managed by Ansible. Edit roles/base/templates/nsxiv-browse.desktop.j2 instead.
+# The default program for images (default_apps). NoDisplay: rofi does not show it.
+Type=Application
+Name=nsxiv
+GenericName=Image Viewer
+Comment=Open an image with the other images of its folder
+Exec=nsxiv-browse %f
+Icon=nsxiv
+Terminal=false
+NoDisplay=true
+Categories=Graphics;Viewer;
+MimeType={{ image_mime_types | join(';') }};

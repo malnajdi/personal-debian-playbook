@@ -1,0 +1,42 @@
+# Managed by Ansible. Edit roles/base/templates/zathurarc.j2 instead.
+# zathura: PDF viewer with vim keys. See "man zathurarc" for the settings.
+
+set font                    "{{ ui_font }} {{ ui_font_size }}"
+# Text that you select goes to the clipboard (and to the CopyQ history)
+set selection-clipboard     clipboard
+set window-title-basename   true
+set statusbar-home-tilde    true
+set scroll-page-aware       true
+
+# Colors ({{ theme_name }})
+set default-bg              "{{ theme.base }}"
+set default-fg              "{{ theme.text }}"
+set statusbar-bg            "{{ theme.mantle }}"
+set statusbar-fg            "{{ theme.text }}"
+set inputbar-bg             "{{ theme.base }}"
+set inputbar-fg             "{{ theme.text }}"
+set notification-bg         "{{ theme.base }}"
+set notification-fg         "{{ theme.text }}"
+set notification-error-bg   "{{ theme.base }}"
+set notification-error-fg   "{{ theme.red }}"
+set notification-warning-bg "{{ theme.base }}"
+set notification-warning-fg "{{ theme.yellow }}"
+set highlight-color         "{{ theme.yellow }}"
+set highlight-active-color  "{{ theme.accent }}"
+set completion-bg           "{{ theme.surface0 }}"
+set completion-fg           "{{ theme.text }}"
+set completion-group-bg     "{{ theme.surface0 }}"
+set completion-group-fg     "{{ theme.accent }}"
+set completion-highlight-bg "{{ theme.surface1 }}"
+set completion-highlight-fg "{{ theme.text }}"
+set index-bg                "{{ theme.base }}"
+set index-fg                "{{ theme.text }}"
+set index-active-bg         "{{ theme.surface1 }}"
+set index-active-fg         "{{ theme.text }}"
+set render-loading-bg       "{{ theme.base }}"
+set render-loading-fg       "{{ theme.text }}"
+
+# Ctrl+R shows the pages in the colors of the theme (dark mode)
+set recolor-lightcolor      "{{ theme.base }}"
+set recolor-darkcolor       "{{ theme.text }}"
+set recolor-keephue         true

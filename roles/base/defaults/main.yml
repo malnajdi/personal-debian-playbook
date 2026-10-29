@@ -88,6 +88,12 @@ essential_packages:
   - flameshot
   # Clipboard history
   - copyq
+  # Image and PDF viewers. The nsxiv keys use file (image type) and gio (trash).
+  - nsxiv
+  - zathura
+  - zathura-pdf-poppler
+  - file
+  - libglib2.0-bin
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
@@ -298,6 +304,27 @@ screenshot_path: "{{ user_home_path }}/Pictures/Screenshots"
 
 # Clipboard history (CopyQ)
 copyq_max_items: 500
+
+# Default programs (~/.config/mimeapps.list)
+# Images open in nsxiv together with the other images of their folder.
+image_mime_types:
+  - image/png
+  - image/jpeg
+  - image/gif
+  - image/webp
+  - image/bmp
+  - image/tiff
+  - image/avif
+  - image/heic
+  - image/heif
+  - image/jxl
+  - image/svg+xml
+default_apps:
+  - desktop: nsxiv-browse.desktop
+    mime_types: "{{ image_mime_types }}"
+  - desktop: org.pwmt.zathura-pdf-poppler.desktop
+    mime_types:
+      - application/pdf
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.

@@ -723,3 +723,51 @@
           - { key: notes_font, value: '"{{ copyq_font }}"' }
           - { key: show_scrollbars, value: "false" }
   notify: restart copyq
+
+# Image and PDF viewers (nsxiv, zathura)
+# The colors of nsxiv are in .Xresources.
+- name: Viewers - install the nsxiv scripts
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.owner }}"
+    mode: 0755
+  loop:
+    # Opens an image with the other images of its folder
+    - { src: nsxiv-browse, dest: /usr/local/bin/nsxiv-browse, owner: root }
+    # Ctrl+X, then c (copy the image), y (copy the path) or d (trash)
+    - src: nsxiv-key-handler
+      dest: "{{ user_config_path }}/nsxiv/exec/key-handler"
+      owner: "{{ user }}"
+  loop_control:
+    label: "{{ item.dest }}"
+
+- name: Viewers - add the menu entry of nsxiv-browse
+  template:
+    src: nsxiv-browse.desktop.j2
+    dest: /usr/local/share/applications/nsxiv-browse.desktop
+    mode: 0644
+
+- name: Viewers - configure zathura
+  template:
+    src: zathurarc.j2
+    dest: "{{ user_config_path }}/zathura/zathurarc"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+
+# Only these keys change. The other default programs in the file stay.
+- name: Set the default programs
+  ini_file:
+    path: "{{ user_config_path }}/mimeapps.list"
+    section: Default Applications
+    option: "{{ item.1 }}"
+    value: "{{ item.0.desktop }}"
+    no_extra_spaces: yes
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+  loop: "{{ default_apps | subelements('mime_types') }}"
+  loop_control:
+    label: "{{ item.1 }}: {{ item.0.desktop }}"

@@ -40,6 +40,8 @@ You can run the playbook again at any time. It only changes what is different.
 | Editor        | Neovim, LazyVim | `nvim/`                               |
 | Screenshots   | flameshot | `roles/base/tasks/main.yml` ("Configure flameshot") |
 | Clipboard     | CopyQ    | `roles/base/tasks/main.yml` ("Configure CopyQ") |
+| Images        | nsxiv    | `.Xresources.j2`, `files/nsxiv-browse`, `files/nsxiv-key-handler` |
+| PDFs          | zathura  | `zathurarc.j2`                               |
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 
@@ -79,6 +81,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `lazyvim_extras`             | Python, TypeScript, Go, ... | LazyVim extras (languages)           |
 | `screenshot_path`            | `~/Pictures/Screenshots` | Folder for screenshots                  |
 | `copyq_max_items`            | `500`              | Items in the clipboard history                |
+| `default_apps`               | nsxiv, zathura     | Default programs for file types               |
 
 ### Keyboard shortcuts
 
@@ -173,6 +176,36 @@ time in the file name. A copy to the clipboard also saves the file. The
 CopyQ keeps the clipboard history: text and images, also after the program
 that copied them closes. Press `Super + V`, type to search, and press `Enter`
 to paste the item. `Esc` closes the window.
+
+### Images and PDFs
+
+Images open in nsxiv and PDFs open in zathura, from Thunar, the browser or
+`xdg-open`. Both use the colors of the theme and keys like vim. nsxiv opens an
+image together with the other images of its folder.
+
+| nsxiv keys            | Action                                    |
+|-----------------------|-------------------------------------------|
+| `n`, `p`              | Next and previous image (also `Space`, `Backspace`) |
+| `Enter`               | Thumbnails of the folder, and back        |
+| `+`, `-`, `=`         | Zoom in, zoom out, 100 %                  |
+| `<`, `>`              | Rotate                                    |
+| `m`                   | Mark the image (for the `Ctrl + X` keys)  |
+| `Ctrl + X`, then `c`  | Copy the image to the clipboard           |
+| `Ctrl + X`, then `y`  | Copy the path of the image                |
+| `Ctrl + X`, then `d`  | Move the image to the trash               |
+| `q`                   | Close                                     |
+
+| zathura keys          | Action                                    |
+|-----------------------|-------------------------------------------|
+| `j`, `k`, `J`, `K`    | Scroll, next and previous page            |
+| `gg`, `G`             | First and last page                       |
+| `/`, `n`, `N`         | Search, next and previous result          |
+| `+`, `-`, `a`, `s`    | Zoom in, zoom out, fit the page, fit the width |
+| `Tab`                 | Table of contents                         |
+| `Ctrl + R`            | Pages in the colors of the theme (dark)   |
+| `q`                   | Close                                     |
+
+Text that you select in zathura goes to the clipboard.
 
 ### Monitors
 

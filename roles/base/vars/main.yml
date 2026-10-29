@@ -25,6 +25,8 @@ directories:
   - "{{ user_config_path }}/nvim/lua/plugins"
   - "{{ user_config_path }}/flameshot"
   - "{{ user_config_path }}/copyq"
+  - "{{ user_config_path }}/zathura"
+  - "{{ user_config_path }}/nsxiv/exec"
   - "{{ user_home_path }}/Pictures"
   - "{{ screenshot_path }}"
   - "{{ user_home_path }}/.xmonad"
