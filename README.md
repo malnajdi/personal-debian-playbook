@@ -42,6 +42,7 @@ You can run the playbook again at any time. It only changes what is different.
 | Clipboard     | CopyQ    | `roles/base/tasks/main.yml` ("Configure CopyQ") |
 | Images        | nsxiv    | `.Xresources.j2`, `files/nsxiv-browse`, `files/nsxiv-key-handler` |
 | PDFs          | zathura  | `zathurarc.j2`                               |
+| Monitors      | autorandr, arandr | `files/monitor-layout`, `.xsessionrc.j2` |
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 
@@ -112,7 +113,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `Alt + Shift + 1`        | Change the keyboard layout (US and Arabic)|
 | `Super + Shift + L`      | Lock the screen                           |
 | `Super + Shift + X`      | Power menu                                |
-| `Super + Shift + S`      | Apply the monitor layout                  |
+| `Super + Shift + S`      | Apply the saved monitor layout again      |
 | `Super + Shift + R`      | Restart xmonad                            |
 | `Print`                  | Screenshot: select an area, draw, then copy (`Enter`) or save (`Ctrl + S`) |
 | `Super + Print`          | The same, after 3 seconds (to capture a menu) |
@@ -228,8 +229,32 @@ Neovim from the launcher) also get the default Node.js version.
 
 ### Monitors
 
-Use `arandr` to set the monitor layout, then save it as
-`~/.screenlayout/screen.sh`. xmonad runs this file when it starts.
+autorandr keeps the monitor layout: the positions, resolutions, refresh rates
+and the primary monitor. It keeps one layout for each set of monitors. It
+applies the layout of the connected monitors when you log in, when you connect
+or disconnect a monitor, and after sleep.
+
+To change the layout:
+
+1. Set the positions and resolutions with `arandr`, and click Apply. arandr
+   cannot set the refresh rate, so set it with `nvidia-settings` (X Server
+   Display Configuration, Refresh, then Apply; do not save the X
+   configuration file), or with xrandr:
+   ```sh
+   xrandr --output DP-2 --mode 2560x1440 --rate 164.55
+   ```
+   `xrandr` shows the outputs and their refresh rates.
+2. Save the layout with a name, for example `desk`:
+   ```sh
+   autorandr --save desk --force
+   ```
+
+`autorandr` shows the saved layouts. If no saved layout matches the connected
+monitors, the session uses the layout that arandr saved in
+`~/.screenlayout/screen.sh` (without refresh rates).
+
+picom syncs to the primary monitor, so it draws at the refresh rate of that
+monitor (for example 165 Hz, not 60 Hz).
 
 # TODO:
 - automate Nvidia dirver installation & configuration

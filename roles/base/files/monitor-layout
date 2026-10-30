@@ -1,0 +1,12 @@
+#!/bin/sh
+# Managed by Ansible
+# Apply the saved monitor layout.
+# autorandr keeps one layout (with the refresh rates) for each set of
+# monitors. When no autorandr layout matches the connected monitors, use the
+# layout that arandr saved in ~/.screenlayout/screen.sh (without refresh rates).
+
+if [ -n "$(autorandr --detected 2>/dev/null)" ]; then
+    exec autorandr --change
+elif [ -f "$HOME/.screenlayout/screen.sh" ]; then
+    exec sh "$HOME/.screenlayout/screen.sh"
+fi

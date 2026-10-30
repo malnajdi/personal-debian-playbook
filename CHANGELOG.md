@@ -25,6 +25,7 @@
 * New windows open on the right (at the end of the stack), not as the main window on the left.
 * flameshot for screenshots: `Print` keys, files in `~/Pictures/Screenshots`, theme colors.
 * CopyQ clipboard history with text and images: `Super + V`.
+* autorandr keeps the monitor layout with the refresh rates, and applies it at login, when a monitor connects or disconnects, and after sleep. picom syncs to the primary monitor, so it draws at its refresh rate.
 
 ### Fixes
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).

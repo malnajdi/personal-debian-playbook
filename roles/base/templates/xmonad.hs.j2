@@ -105,8 +105,8 @@ myGap = {{ xmonad_gap }}           -- Gap between windows and around the screen
 ------------------------------------------------------------------------
 myStartupHook :: X ()
 myStartupHook = do
-          -- Set the monitor layout first, then the wallpaper on each monitor
-          spawnOnce "[ -f ~/.screenlayout/screen.sh ] && sh ~/.screenlayout/screen.sh; nitrogen --restore"
+          -- The wallpaper on each monitor. ~/.xsessionrc set the monitor layout.
+          spawnOnce "nitrogen --restore"
           spawnOnce "xsetroot -cursor_name left_ptr"
           spawnOnce "copyq --start-server"    -- Clipboard history
           spawnOnce "flameshot"               -- Screenshots (no tray icon)
@@ -170,7 +170,7 @@ myKeys =
         , ("M-S-r", spawn "xmonad --restart && nitrogen --restore")        -- Restarts xmonad
         , ("M-S-q", io exitSuccess)                  -- Quits xmonad
         , ("M-S-l", spawn "{{ user_config_path }}/i3lock/lock_multi_screen.sh")        -- lock screen
-        , ("M-S-s", spawn "sh ~/.screenlayout/screen.sh")        -- screen order
+        , ("M-S-s", spawn "monitor-layout; nitrogen --restore")        -- apply the saved monitor layout
         , ("M-S-x", spawn "{{ user_config_path }}/powermenu.sh")        -- power menu
 
     --- Windows

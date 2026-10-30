@@ -88,6 +88,8 @@ essential_packages:
   - flameshot
   # Clipboard history
   - copyq
+  # Monitor layouts with the refresh rates (arandr does not save them)
+  - autorandr
   # Image and PDF viewers. The nsxiv keys use file (image type) and gio (trash).
   - nsxiv
   - zathura

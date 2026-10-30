@@ -401,6 +401,54 @@
     group: "{{ group }}"
     mode: 0744
 
+# Monitors (autorandr)
+# autorandr keeps one layout for each set of monitors, with the refresh rates.
+# It applies the layout at login (~/.xsessionrc), when a monitor connects or
+# disconnects, and after sleep. "autorandr --save NAME" saves the layout.
+- name: Monitors - install the layout script
+  copy:
+    src: monitor-layout
+    dest: /usr/local/bin/monitor-layout
+    mode: 0755
+
+- name: Monitors - configure autorandr
+  copy:
+    content: |
+      # Managed by Ansible
+      # The NVIDIA driver can give a monitor a different CRTC after a restart,
+      # so autorandr does not save or set the CRTC.
+      [config]
+      skip-options=crtc
+    dest: "{{ user_config_path }}/autorandr/settings.ini"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+
+- name: Monitors - set the wallpaper again after a layout change
+  copy:
+    content: |
+      #!/bin/sh
+      # Managed by Ansible
+      # autorandr runs this file after it changes the monitor layout.
+      nitrogen --restore
+    dest: "{{ user_config_path }}/autorandr/postswitch"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0755
+
+# The lid service of autorandr reads all the input events. Only a laptop needs it.
+- name: Monitors - check for a laptop lid
+  stat:
+    path: /proc/acpi/button/lid
+  register: lid_switch
+
+- name: Monitors - stop the autorandr lid service when there is no lid
+  systemd:
+    name: autorandr-lid-listener
+    enabled: no
+    state: stopped
+  when: not lid_switch.stat.exists
+
 # Language
 - name: Create change language script
   template:

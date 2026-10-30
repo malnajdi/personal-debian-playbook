@@ -7,9 +7,20 @@ if [ -d "$HOME/.nvm/versions/node/{{ nvm_node_version }}/bin" ]; then
     PATH="$HOME/.nvm/versions/node/{{ nvm_node_version }}/bin:$PATH"
 fi
 
+# Apply the saved monitor layout (autorandr) first, so picom and xmonad start
+# with the final monitors and refresh rates. Xsession stops on an error.
+/usr/local/bin/monitor-layout || true
+
 # Start the compositor first. With "-b", picom returns when it is ready, so it
 # shows the bars that xmonad starts after it. If picom starts at the same time
 # as the bars, the bars can stay black or old until their text changes.
+# picom syncs to one monitor only. The NVIDIA driver can select a 60 Hz
+# monitor, and then picom draws all the monitors at 60 Hz. Sync to the primary.
+picom_sync=$(xrandr --current | awk '/ connected primary/ { print $1; exit }')
 if command -v picom >/dev/null && ! pgrep -x -u "$(id -u)" picom >/dev/null; then
-    picom -b
+    if [ -n "$picom_sync" ]; then
+        __GL_SYNC_DISPLAY_DEVICE=$picom_sync picom -b
+    else
+        picom -b
+    fi
 fi
