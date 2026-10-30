@@ -34,15 +34,16 @@
   '<action=`sh ' ~ user_config_path ~ '/change-lang.sh`>%kbd%</action>']
   + (['%battery%'] if has_battery | bool else [])
   + ['<fc=' ~ theme.crust ~ ',' ~ theme.accent ~ ':0> <fn=1>' ~ icon.calendar ~ '</fn> %date% </fc>',
-     '<action=`' ~ user_config_path ~ '/powermenu.sh`><fc=' ~ theme.red ~ '><fn=1>' ~ icon.power ~ '</fn></fc></action>'] %}
+     '<action=`' ~ user_config_path ~ '/power-settings.sh awake off`>%power%</action>'
+     ~ '<action=`' ~ user_config_path ~ '/powermenu.sh`><fc=' ~ theme.red ~ '><fn=1>' ~ icon.power ~ '</fn></fc></action>'] %}
 -- xmobar: the bar on each screen
 -- Managed by Ansible. Edit roles/base/templates/xmobarrc.j2 instead.
 -- https://codeberg.org/xmobar/xmobar
 --
 -- Left:  Debian menu, workspaces, layout (from xmonad)
--- Right: CPU, memory, disk, network, Wi-Fi, Bluetooth, volume, keyboard, date, power menu
+-- Right: CPU, memory, disk, network, Wi-Fi, Bluetooth, volume, keyboard, date, keep awake, power menu
 -- Click: workspaces, layout, Wi-Fi and Bluetooth (right click: on/off), volume (scroll to change),
---        keyboard, Debian logo and power icon
+--        keyboard, Debian logo, coffee icon (keep awake off) and power icon
 
 Config { font            = "{{ bar_font }} {{ bar_font_size }}"
        , additionalFonts = [ "{{ bar_font }} {{ bar_font_size + 2 }}"    -- fn=1: icons
@@ -86,6 +87,8 @@ Config { font            = "{{ bar_font }} {{ bar_font_size }}"
                       -- Volume of the default output. The script runs all the time
                       -- and prints a new line when the volume changes.
                     , Run CommandReader "{{ user_config_path }}/xmobar/scripts/volume.sh" "volume"
+                      -- The coffee icon while "Keep awake" is on (power settings)
+                    , Run CommandReader "{{ user_config_path }}/xmobar/scripts/power.sh" "power"
                       -- Keyboard layout
                     , Run Kbd [ ("ara", "<fc={{ theme.pink }}><fn=1>{{ icon.keyboard }}</fn></fc> AR")
                               , ("us", "<fc={{ theme.pink }}><fn=1>{{ icon.keyboard }}</fn></fc> US")

@@ -110,6 +110,10 @@ myStartupHook = do
           spawnOnce "xsetroot -cursor_name left_ptr"
           spawnOnce "copyq --start-server"    -- Clipboard history
           spawnOnce "flameshot"               -- Screenshots (no tray icon)
+          -- Power settings: screen off time, lock when the screen turns off and before sleep, sleep when idle
+          spawnOnce "{{ user_config_path }}/power-settings.sh apply"
+          spawnOnce "xss-lock --transfer-sleep-lock -- {{ user_config_path }}/power-settings.sh lock"
+          spawnOnce "{{ user_config_path }}/power-settings.sh idle"
           -- picom starts from ~/.xsessionrc, before xmonad and the bars
 
 ------------------------------------------------------------------------
@@ -172,6 +176,9 @@ myKeys =
         , ("M-S-l", spawn "{{ user_config_path }}/i3lock/lock_multi_screen.sh")        -- lock screen
         , ("M-S-s", spawn "monitor-layout; nitrogen --restore")        -- apply the saved monitor layout
         , ("M-S-x", spawn "{{ user_config_path }}/powermenu.sh")        -- power menu
+{% if power_key == 'menu' %}
+        , ("<XF86PowerOff>", spawn "{{ user_config_path }}/powermenu.sh")  -- power button: power menu
+{% endif %}
 
     --- Windows
         , ("M-S-c", kill1)                           -- Kill the currently focused client

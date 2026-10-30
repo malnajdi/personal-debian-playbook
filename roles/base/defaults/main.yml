@@ -90,6 +90,8 @@ essential_packages:
   - copyq
   # Monitor layouts with the refresh rates (arandr does not save them)
   - autorandr
+  # Power: lock the screen when it turns off and before sleep
+  - xss-lock
   # Image and PDF viewers. The nsxiv keys use file (image type) and gio (trash).
   - nsxiv
   - zathura
@@ -320,6 +322,20 @@ screenshot_path: "{{ user_home_path }}/Pictures/Screenshots"
 
 # Clipboard history (CopyQ)
 copyq_max_items: 500
+
+# Power
+# These are the defaults. The power settings menu (Super+Shift+X, then
+# "Power settings") changes them, and keeps your choices after a restart.
+# Minutes without keyboard or mouse input before the screen turns off (0: never)
+power_screen_off_minutes: 10
+# Lock the screen when it turns off. The screen always locks before sleep.
+power_lock_on_screen_off: true
+# Minutes without input before the computer sleeps (0: never). It does not
+# sleep while sound plays.
+power_sleep_minutes: 0
+# Power button: menu (the power menu), suspend, poweroff or ignore.
+# A long press always turns the computer off.
+power_key: menu
 
 # Default programs (~/.config/mimeapps.list)
 # Images open in nsxiv together with the other images of their folder.

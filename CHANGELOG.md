@@ -25,6 +25,7 @@
 * New windows open on the right (at the end of the stack), not as the main window on the left.
 * flameshot for screenshots: `Print` keys, files in `~/Pictures/Screenshots`, theme colors.
 * CopyQ clipboard history with text and images: `Super + V`.
+* Power settings menu (in the power menu): keep awake (coffee icon in the bar), screen off time, lock when the screen turns off, and sleep when idle (not while sound plays). The screen locks before sleep, and the power button opens the power menu. The NVIDIA driver keeps the video memory during sleep.
 * autorandr keeps the monitor layout with the refresh rates, and applies it at login, when a monitor connects or disconnects, and after sleep. picom syncs to the primary monitor, so it draws at its refresh rate.
 
 ### Fixes

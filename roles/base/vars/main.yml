@@ -29,6 +29,7 @@ directories:
   - "{{ user_config_path }}/zathura"
   - "{{ user_config_path }}/nsxiv/exec"
   - "{{ user_home_path }}/.local/bin"
+  - "{{ user_home_path }}/.local/state"
   - "{{ user_home_path }}/Pictures"
   - "{{ screenshot_path }}"
   - "{{ user_home_path }}/.xmonad"

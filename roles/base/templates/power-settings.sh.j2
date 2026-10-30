@@ -1,0 +1,139 @@
+#!/bin/bash
+# Managed by Ansible
+# Power settings: screen off, screen lock, sleep and keep awake.
+#   power-settings.sh                   rofi menu (also in the power menu)
+#   power-settings.sh apply             set the screen off time (xmonad runs it at login)
+#   power-settings.sh awake [on|off]    turn "Keep awake" on, off, or change it
+#   power-settings.sh lock              lock the screen (xss-lock runs it)
+#   power-settings.sh idle              sleep after the idle time (xmonad runs it at login)
+# The defaults come from the playbook. The choices that you make in the menu
+# are in ~/.local/state/power-settings, and they stay after a restart.
+
+state="${XDG_STATE_HOME:-$HOME/.local/state}/power-settings"
+lock_screen="{{ user_config_path }}/i3lock/lock_multi_screen.sh"
+
+# Times are in minutes. 0 is never.
+load() {
+    screen_off={{ power_screen_off_minutes }}
+    sleep_after={{ power_sleep_minutes }}
+    lock={{ 'yes' if power_lock_on_screen_off | bool else 'no' }}
+    awake=no
+    if [ -f "$state" ]; then . "$state"; fi
+}
+
+save() {
+    mkdir -p "${state%/*}"
+    printf 'screen_off=%s\nsleep_after=%s\nlock=%s\nawake=%s\n' \
+        "$screen_off" "$sleep_after" "$lock" "$awake" > "$state"
+}
+
+# The X screen saver starts (then xss-lock locks the screen) and the monitors
+# turn off at the same time. Without timeouts, a forced screen off stays
+# until the next key or mouse movement.
+apply() {
+    if [ "$awake" = yes ] || [ "$screen_off" -eq 0 ]; then
+        xset s off dpms 0 0 0 -dpms
+    else
+        local seconds=$((screen_off * 60))
+        xset s "$seconds" "$seconds" dpms "$seconds" "$seconds" "$seconds" +dpms
+    fi
+}
+
+minutes() {
+    if [ "$1" -eq 0 ]; then echo "never"
+    elif [ "$1" -eq 60 ]; then echo "1 hour"
+    elif [ $(($1 % 60)) -eq 0 ]; then echo "$(($1 / 60)) hours"
+    else echo "$1 min"
+    fi
+}
+
+on_off() {
+    if [ "$1" = yes ]; then echo on; else echo off; fi
+}
+
+opposite() {
+    if [ "$1" = yes ]; then echo no; else echo yes; fi
+}
+
+# rofi prints the number of the selected line (from 0). $1 is the prompt, $2 the number of lines.
+menu() {
+    rofi -dmenu -i -format i -p "$1" -theme-str "window { width: 560px; } listview { lines: $2; }"
+}
+
+# Print the selected time. $1 is the prompt, $2 the current time, then the times.
+choose_minutes() {
+    local prompt=$1 current=$2 index
+    shift 2
+    local times=("$@") count=$#
+    index=$(for time in "${times[@]}"; do
+        # check icon on the current time
+        if [ "$time" -eq "$current" ]; then echo "$(minutes "$time")  "; else minutes "$time"; fi
+    done | menu "$prompt" "$count") || return 1
+    echo "${times[$index]}"
+}
+
+main_menu() {
+    local choice time
+    while :; do
+        load
+        choice=$(printf '%s\n' \
+            "  Keep awake: $(on_off "$awake")" \
+            "  Screen off after: $(minutes "$screen_off")" \
+            "  Lock when the screen turns off: $(on_off "$lock")" \
+            "  Sleep after: $(minutes "$sleep_after")" \
+            "  Turn the screen off now" \
+            | menu "Power settings" 5) || exit 0
+        case "$choice" in
+            0) awake=$(opposite "$awake") ;;
+            1) time=$(choose_minutes "Screen off after" "$screen_off" 5 10 15 30 60 0) && screen_off=$time ;;
+            2) lock=$(opposite "$lock") ;;
+            3) time=$(choose_minutes "Sleep after" "$sleep_after" 15 30 60 120 180 0) && sleep_after=$time ;;
+            4) # Wait for the release of Enter, which turns the screen on again
+               sleep 1
+               xset dpms force off
+               exit 0 ;;
+        esac
+        save
+        apply
+    done
+}
+
+load
+case "$1" in
+    apply)
+        apply ;;
+    awake)
+        case "$2" in
+            on) awake=yes ;;
+            off) awake=no ;;
+            *) awake=$(opposite "$awake") ;;
+        esac
+        save
+        apply ;;
+    lock)
+        locked() { pgrep -xu "$EUID" i3lock >/dev/null; }
+        if [[ -e /dev/fd/${XSS_SLEEP_LOCK_FD:--1} ]]; then
+            # Before sleep: always lock. Then close the sleep lock of xss-lock,
+            # so the computer can sleep. i3lock must not get a copy of it.
+            locked || "$lock_screen" {XSS_SLEEP_LOCK_FD}<&-
+            exec {XSS_SLEEP_LOCK_FD}<&-
+        elif [ "$lock" = yes ]; then
+            locked || "$lock_screen"
+        fi
+        # Stay until the screen is unlocked, so xss-lock does not start a second lock
+        while locked; do sleep 1; done ;;
+    idle)
+        # Sleep after "Sleep after" minutes without keyboard or mouse input.
+        # Do not sleep while sound plays (a video or music) or "Keep awake" is on.
+        while sleep 60; do
+            # xssstate fails when the X session stops
+            idle_ms=$(xssstate -i) || exit 0
+            load
+            [ "$awake" = no ] && [ "$sleep_after" -gt 0 ] || continue
+            [ "$idle_ms" -ge $((sleep_after * 60000)) ] || continue
+            LC_ALL=C pactl list short sinks 2>/dev/null | grep -q 'RUNNING$' && continue
+            systemctl --no-ask-password suspend
+        done ;;
+    *)
+        main_menu ;;
+esac

@@ -35,6 +35,15 @@
 - name: reload deamon
   command: "systemctl daemon-reload"
 
+- name: reload logind
+  systemd:
+    name: systemd-logind
+    state: reloaded
+
+- name: restart for the nvidia option
+  debug:
+    msg: "Restart the computer. The NVIDIA driver reads the new sleep option only when it starts."
+
 - name: reconfigure fontconfig
   command: "dpkg-reconfigure fontconfig"
 

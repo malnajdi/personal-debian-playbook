@@ -216,7 +216,7 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0755
-  loop: "{{ ['alias_dmenu.sh', 'powermenu.sh']
+  loop: "{{ ['alias_dmenu.sh', 'powermenu.sh', 'power-settings.sh']
     + (['wifi-menu.sh'] if has_wifi else [])
     + (['bluetooth-menu.sh'] if has_bluetooth else []) }}"
 
@@ -276,7 +276,7 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0755
-  loop: "{{ ['volume.sh']
+  loop: "{{ ['volume.sh', 'power.sh']
     + (['wifi.sh'] if has_wifi else [])
     + (['bluetooth.sh'] if has_bluetooth else []) }}"
 
@@ -448,6 +448,46 @@
     enabled: no
     state: stopped
   when: not lid_switch.stat.exists
+
+# Power
+# power-settings.sh (rofi menu) sets the screen off time, the lock and the
+# sleep time. xmonad starts it with xss-lock at login.
+- name: Power - make the logind configuration folder
+  file:
+    path: /etc/systemd/logind.conf.d
+    state: directory
+    mode: 0755
+
+- name: Power - set the power button
+  copy:
+    content: |
+      # Managed by Ansible
+      # "ignore" lets xmonad open the power menu (power_key: menu).
+      [Login]
+      HandlePowerKey={{ 'ignore' if power_key == 'menu' else power_key }}
+    dest: /etc/systemd/logind.conf.d/50-power-key.conf
+    mode: 0644
+  notify: reload logind
+
+# Debian names the NVIDIA module nvidia-current
+- name: Power - check for the NVIDIA driver
+  command: modinfo -F filename nvidia-current
+  register: nvidia_module
+  changed_when: false
+  failed_when: false
+
+# Without this option, the windows can be black or broken after sleep.
+# nvidia-suspend.service saves the video memory in /var/tmp.
+- name: Power - keep the NVIDIA video memory during sleep
+  copy:
+    content: |
+      # Managed by Ansible
+      # Keep the video memory during sleep, so the windows are correct after sleep.
+      options nvidia-current NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath=/var/tmp
+    dest: /etc/modprobe.d/nvidia-power.conf
+    mode: 0644
+  when: nvidia_module.rc == 0
+  notify: restart for the nvidia option
 
 # Language
 - name: Create change language script

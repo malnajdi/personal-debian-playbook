@@ -43,6 +43,7 @@ You can run the playbook again at any time. It only changes what is different.
 | Images        | nsxiv    | `.Xresources.j2`, `files/nsxiv-browse`, `files/nsxiv-key-handler` |
 | PDFs          | zathura  | `zathurarc.j2`                               |
 | Monitors      | autorandr, arandr | `files/monitor-layout`, `.xsessionrc.j2` |
+| Power         | xss-lock, i3lock | `power-settings.sh.j2`, `power.sh.j2`  |
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 
@@ -82,6 +83,10 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `lazyvim_extras`             | Python, TypeScript, Go, ... | LazyVim extras (languages)           |
 | `screenshot_path`            | `~/Pictures/Screenshots` | Folder for screenshots                  |
 | `copyq_max_items`            | `500`              | Items in the clipboard history                |
+| `power_screen_off_minutes`   | `10`               | Minutes without input before the screen turns off (`0`: never) |
+| `power_lock_on_screen_off`   | `true`             | Lock the screen when it turns off             |
+| `power_sleep_minutes`        | `0`                | Minutes without input before the computer sleeps (`0`: never) |
+| `power_key`                  | `menu`             | Power button: `menu`, `suspend`, `poweroff` or `ignore` |
 | `default_apps`               | nsxiv, zathura     | Default programs for file types               |
 | `uv_version`                 | `0.9.28`           | uv release from GitHub                        |
 | `pyenv_version`              | `v2.6.3`           | pyenv version (git tag)                       |
@@ -112,7 +117,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `Super + Shift + C`      | Close the window                          |
 | `Alt + Shift + 1`        | Change the keyboard layout (US and Arabic)|
 | `Super + Shift + L`      | Lock the screen                           |
-| `Super + Shift + X`      | Power menu                                |
+| `Super + Shift + X`      | Power menu (also the power button)        |
 | `Super + Shift + S`      | Apply the saved monitor layout again      |
 | `Super + Shift + R`      | Restart xmonad                            |
 | `Print`                  | Screenshot: select an area, draw, then copy (`Enter`) or save (`Ctrl + S`) |
@@ -123,7 +128,8 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 
 You can also click the bar: workspaces, the layout name, the Debian logo (launcher),
 Wi-Fi and Bluetooth (click: menu, right click: on/off), the volume (click: mixer,
-scroll: volume, middle click: mute), the keyboard layout and the power icon.
+scroll: volume, middle click: mute), the keyboard layout, the coffee icon (keep
+awake off) and the power icon.
 
 Wi-Fi and Bluetooth are only in the bar when the device has the hardware. The
 playbook then installs NetworkManager (`network-manager`) and BlueZ (`bluez`).
@@ -255,6 +261,29 @@ monitors, the session uses the layout that arandr saved in
 
 picom syncs to the primary monitor, so it draws at the refresh rate of that
 monitor (for example 165 Hz, not 60 Hz).
+
+### Power
+
+Open the power menu (`Super + Shift + X`, the power button or the power icon),
+then "Power settings":
+
+| Item                            | Action                                        |
+|---------------------------------|-----------------------------------------------|
+| Keep awake                      | The screen does not turn off or lock, and the computer does not sleep. The bar shows a coffee icon. Click the icon to turn it off. |
+| Screen off after                | Minutes without keyboard or mouse input before the monitors turn off |
+| Lock when the screen turns off  | Lock the screen when the monitors turn off   |
+| Sleep after                     | Minutes without input before the computer sleeps. It does not sleep while sound plays (a video or music). |
+| Turn the screen off now         | The monitors turn off until you move the mouse or push a key |
+
+Your choices apply immediately and stay after a restart (in
+`~/.local/state/power-settings`). The defaults are the `power_*` settings.
+
+The screen always locks before the computer sleeps. The power button opens the
+power menu; a long press turns the computer off.
+
+With the NVIDIA driver, the playbook sets the driver to keep the video memory
+during sleep. Without it, the windows can be black or broken after sleep.
+Restart the computer once after the playbook sets it.
 
 # TODO:
 - automate Nvidia dirver installation & configuration

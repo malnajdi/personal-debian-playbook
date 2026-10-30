@@ -1,0 +1,23 @@
+#!/bin/sh
+# Managed by Ansible
+# Print the "Keep awake" icon for xmobar (CommandReader) while "Keep awake"
+# is on, and an empty line while it is off. The power settings menu writes
+# the state file.
+
+# xmobar gets the xmonad log on stdin. Do not let child commands read it.
+exec </dev/null
+
+state="${XDG_STATE_HOME:-$HOME/.local/state}/power-settings"
+
+while :; do
+    awake=no
+    if [ -f "$state" ]; then . "$state"; fi
+    # Stop when xmobar stops (the write fails)
+    if [ "$awake" = yes ]; then
+        # coffee icon
+        printf '<fc={{ theme.yellow }}><fn=1></fn></fc>  \n' || exit 0
+    else
+        echo || exit 0
+    fi
+    sleep 1
+done
