@@ -25,10 +25,47 @@ if [[ ";${PROMPT_COMMAND:-};" != *";history -a;"* ]]; then
     PROMPT_COMMAND="history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
 
-# Window title: user@host: directory. The tabs layout of xmonad shows it.
-# ~/.bashrc of Debian sets the title only in xterm and rxvt.
-if [[ $TERM == st* && $PS1 != *'\e]0;'* ]]; then
-    PS1="\[\e]0;\u@\h: \w\a\]$PS1"
+# Prompt on two lines, so the command always gets the full width:
+#   ~/p/w/i/devops/ansible-playbook   main   .venv
+#   ❯
+# The parent directories show only their first letter. The window title (in
+# the bar and the tabs layout) shows the full path. The git branch and the
+# Python virtual environment show when you are in one. ❯ is red when the
+# last command failed. user@host shows only over SSH.
+# PS1 refers to the directory and the branch through variables, so bash does
+# not run a "$(...)" that is in a directory or branch name.
+{% set accent_rgb = [theme.accent[1:3], theme.accent[3:5], theme.accent[5:7]] | map('int', base=16) | join(';') %}
+VIRTUAL_ENV_DISABLE_PROMPT=1
+PYENV_VIRTUALENV_DISABLE_PROMPT=1
+__prompt() {
+    local status=$? rest=${PWD/#"$HOME"/\~} part ps=
+    __prompt_dir=
+    while [[ $rest == */* ]]; do
+        part=${rest%%/*}
+        rest=${rest#*/}
+        [[ $part == .* ]] && __prompt_dir+=${part:0:2}/ || __prompt_dir+=${part:0:1}/
+    done
+    __prompt_dir+=$rest
+    __prompt_git=
+    declare -F __git_ps1 >/dev/null && __prompt_git=$(__git_ps1 '%s')
+
+    # Window title: user@host: directory
+    [[ $TERM == st* || $TERM == xterm* || $TERM == rxvt* ]] && ps+='\[\e]0;\u@\h: \w\a\]'
+    [[ -n $SSH_CONNECTION ]] && ps+='\[\e[1;36m\]\u@\h\[\e[0m\] '
+    ps+='\[\e[1;34m\]${__prompt_dir}\[\e[0m\]'
+    [[ -n $__prompt_git ]] && ps+='  \[\e[32m\] ${__prompt_git}\[\e[0m\]'
+    [[ -n $VIRTUAL_ENV ]] && ps+='  \[\e[33m\] ${VIRTUAL_ENV##*/}\[\e[0m\]'
+    if (( status == 0 )); then
+        ps+='\n\[\e[1;38;2;{{ accent_rgb }}m\]❯\[\e[0m\] '
+    else
+        ps+='\n\[\e[1;31m\]❯\[\e[0m\] '
+    fi
+    PS1=$ps
+}
+
+# __prompt runs first, so it gets the exit status of the command
+if [[ ";${PROMPT_COMMAND:-};" != *";__prompt;"* ]]; then
+    PROMPT_COMMAND="__prompt${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
 
 # Developer tools. The playbook installs nvm, pyenv and uv; you install Pulumi

@@ -150,8 +150,21 @@ does not lose its commands.
 | `Alt + C`     | Go to a directory                                        |
 | `** + Tab`    | Complete paths, ssh hosts and processes (`ssh **`, `kill **`) |
 
-The window title of st is `user@host: directory`, so each tab of the tabs
-layout shows its directory.
+The prompt has two lines, so the command always gets the full width of the
+window:
+
+```
+~/p/w/i/devops/ansible-playbook   main   .venv
+❯
+```
+
+- The parent directories show only their first letter. The window title of st
+  shows the full path (`user@host: directory`), so the bar and each tab of the
+  tabs layout show it.
+- The git branch shows in a git repository, and the Python virtual environment
+  shows when one is active.
+- `❯` is red when the last command failed.
+- `user@host` shows only over SSH.
 
 `~/.config/bash/bashrc` also loads the developer tools: nvm, pyenv (with
 pyenv-virtualenv) and uv, which the playbook installs, and Pulumi and Rust, which

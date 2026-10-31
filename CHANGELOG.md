@@ -48,3 +48,4 @@
 * The `screenshot` alias saved one file each day in the current directory, and a second screenshot on the same day replaced the first.
 * rofi opens terminal applications in st.
 * st shows `user@host: directory` as the window title (and in the tabs layout), not `st`.
+* A long directory path left no space to type the command. The prompt now has two lines, shows the parent directories with their first letter, and shows the git branch, the Python virtual environment and the status of the last command.
