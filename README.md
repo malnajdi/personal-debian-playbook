@@ -35,7 +35,7 @@ You can run the playbook again at any time. It only changes what is different.
 | Compositor    | picom    | `picom.conf.j2`                              |
 | Menus         | rofi     | `rofi.rasi.j2`, `powermenu.sh.j2`, `alias_dmenu.sh.j2` |
 | Notifications | dunst    | `dunstrc.j2`                                 |
-| Terminal      | st       | `st_config.h.j2`, `files/st-0.8.2-neovim.patch` |
+| Terminal      | st 0.9.3 | `st_config.h.j2`, `files/st/patches/`        |
 | Shell         | bash, fzf | `bashrc.j2`, `.bash_aliases.j2`             |
 | Editor        | Neovim, LazyVim | `nvim/`                               |
 | Screenshots   | flameshot | `roles/base/tasks/main.yml` ("Configure flameshot") |
@@ -75,6 +75,7 @@ All settings are in `roles/base/defaults/main.yml`. The most important are:
 | `xmonad_show_workspace_name` | `true`             | Show the workspace name when it changes       |
 | `bar_height`                 | `34`               | Height of the bar                             |
 | `bar_alpha`                  | `235`              | Bar transparency (0 to 255)                   |
+| `st_alpha`                   | `95`               | Terminal background opacity in percent (the text stays opaque) |
 | `picom_backend`              | `glx`              | Use `egl` or `xrender` if the screen does not update |
 | `picom_animations`           | `true`             | Animations when windows open and close        |
 | `bash_history_size`          | `100000`           | Commands in the history that Ctrl+R searches  |
@@ -137,6 +138,29 @@ The Wi-Fi menu lists the networks and asks for the password of a new network.
 The Bluetooth menu connects paired devices, and scans for new devices to pair.
 When a keyboard needs a passkey to pair, a notification shows the passkey to type on it.
 
+### Terminal (st)
+
+The playbook builds st 0.9.3 with these patches from `roles/base/files/st/patches`.
+The top of each patch file tells what it does and where it comes from.
+
+- scrollback: 2000 lines of history.
+- alpha: the background is transparent (`st_alpha`), the text is not.
+- boxdraw: lines and boxes (Neovim borders, file trees) join with no gaps.
+- ligatures: the font shows `=>`, `!=` and `->` as one symbol.
+- undercurl: curly underlines for spelling and errors in Neovim.
+- newterm and copyurl: the keys below.
+- anysize: st fills its tile and centers the text.
+
+| Keys                             | Action                                     |
+|----------------------------------|--------------------------------------------|
+| Mouse wheel                      | Scroll the history. In `less`, `man` and Neovim, the wheel scrolls the program. |
+| `Shift + PageUp` / `PageDown`    | Scroll the history one page. A key press goes back to the bottom. |
+| `Ctrl + Shift + Enter`           | New terminal in the same directory         |
+| `Alt + L`                        | Copy the previous URL on the screen (press again for the URL before it) |
+| `Alt + Shift + L`                | Copy the next URL                          |
+| `Ctrl + Shift + C` / `V`         | Copy / paste with the clipboard            |
+| `Ctrl + Shift + PageUp` / `PageDown` | Larger / smaller text (`Ctrl + Shift + Home`: normal size) |
+
 ### Shell
 
 The playbook keeps all the bash history in `~/.bash_history`, with the date of
@@ -186,9 +210,6 @@ tree-sitter CLI 0.26 or newer, so the playbook installs them from GitHub to
 - `:Lazy` shows the plugins, `:Mason` shows the language servers, `:LazyExtras`
   shows the extras. Add extras to `lazyvim_extras` to keep them.
 - Edit the configuration in `roles/base/templates/nvim/`, then run the playbook.
-
-st 0.8.2 gets a small patch for Neovim 0.12 (`files/st-0.8.2-neovim.patch`).
-Without it, st shows "â" in place of lines and icons.
 
 ### Screenshots
 

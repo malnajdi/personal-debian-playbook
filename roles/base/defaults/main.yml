@@ -130,6 +130,7 @@ desktop_packages:
   - libxft-dev
   - libfontconfig-dev
   - libfreetype-dev
+  - libharfbuzz-dev
   - xz-utils
 
 # Installed only when the device has Wi-Fi or Bluetooth
@@ -276,9 +277,8 @@ bar_alpha: 235
 picom_backend: glx
 picom_corner_radius: 10
 picom_animations: true
+# st sets the opacity of its background itself (st_alpha)
 picom_opacity_apps:
-  - name: st-256color
-    opacity: 95
   - name: Code
     opacity: 97
   - name: steam
@@ -379,7 +379,10 @@ nvm_node_version: v24.2.0
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.
 st_font_size: 15
+# Smallest space around the text. st centers the text in its window.
 st_padding: 14
+# Opacity of the background in percent. The text stays opaque.
+st_alpha: 95
 
 # Vscode Extentions
 vscode_extentions:

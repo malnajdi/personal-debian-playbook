@@ -165,40 +165,53 @@
     group: "{{ group }}"
     mode: 0644
 
-# Suckless Terminal
-- name: Check if suckless terminal (st) is installed
-  stat:
-    path: /usr/local/bin/st
-  register: st_installed
+# Suckless Terminal (st)
+# st is built from files/st with the patches in files/st/patches (the top of
+# each patch file tells what it does). The patches change the same lines, so
+# they apply in order to a new copy of the source each time. st is built again
+# when the source, a patch or config.h changes, or when the installed version
+# is not st_version.
+- name: st - copy the source and the patches
+  copy:
+    src: st/
+    dest: "{{ st_source_path }}/"
+  register: st_source
 
-- name: Extract suckless terminal (st)
-  unarchive:
-    src: st-0.8.2.tar.gz
-    dest: "{{ user_config_path }}"
-    owner: "{{ user }}"
-    group: "{{ group }}"
-  when: not st_installed.stat.exists
-
-# Fixes for Neovim 0.12. See the patch file.
-- name: Patch suckless terminal (st)
-  patch:
-    src: st-0.8.2-neovim.patch
-    basedir: "{{ user_config_path }}/st-0.8.2"
-  register: st_patched
-
-- name: Configure suckless terminal (st)
+- name: st - configure
   template:
     src: st_config.h.j2
-    dest: "{{ user_config_path }}/st-0.8.2/config.h"
-    owner: "{{ user }}"
-    group: "{{ group }}"
+    dest: "{{ st_source_path }}/config.h"
   register: st_configured
 
-- name: Build Suckless terminal (st)
-  command: make clean install
+- name: st - read the installed version
+  command: /usr/local/bin/st -v
+  register: st_installed
+  changed_when: false
+  failed_when: false
+
+- name: st - build and install
+  shell: |
+    set -e
+    rm -rf build
+    mkdir build
+    tar -xzf st-{{ st_version }}.tar.gz -C build --strip-components=1
+    cd build
+    for p in {{ lookup('fileglob', 'st/patches/*.patch', wantlist=True) | map('basename') | sort | join(' ') }}; do
+        patch -p1 --forward --quiet < "../patches/$p"
+    done
+    cp ../config.h config.h
+    make clean install
   args:
-    chdir: "{{ user_config_path }}/st-0.8.2/"
-  when: st_configured.changed or st_patched.changed or not st_installed.stat.exists
+    chdir: "{{ st_source_path }}"
+  when: >-
+    st_source.changed or st_configured.changed
+    or ('st ' ~ st_version) not in (st_installed.stdout ~ st_installed.stderr)
+
+# The playbook built st 0.8.2 in ~/.config/st-0.8.2
+- name: st - remove the old source
+  file:
+    path: "{{ user_config_path }}/st-0.8.2"
+    state: absent
 
 # Rofi (application launcher and menus)
 - name: Configure rofi

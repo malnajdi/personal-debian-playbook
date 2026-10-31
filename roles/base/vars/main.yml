@@ -4,6 +4,10 @@ user_config_path: "{{ user_home_path }}/.config"
 user_wallpaper_path: "{{ user_home_path }}/Wallpapers"
 user_wallpaper: "{{ user_wallpaper_path }}/{{ default_user_wallpaper_name }}.png"
 
+# st source in files/st, and where the playbook builds it
+st_version: 0.9.3
+st_source_path: /usr/local/src/st
+
 directories:
   - "{{ user_config_path }}"
   - "{{ user_config_path }}/picom"
