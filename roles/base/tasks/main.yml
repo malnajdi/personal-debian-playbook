@@ -949,3 +949,44 @@
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: 0644
+
+# Vagrant with libvirt. The packages are vagrant, vagrant-libvirt and
+# nfs-kernel-server (Debian boxes mount /vagrant over NFS, and Vagrant asks for
+# your sudo password to export the folder).
+# The plugins in ~/.vagrant.d stop working when Debian changes the Ruby version
+# (for example from Debian 12 to 13). Then Vagrant does not start, and
+# "vagrant plugin repair" also fails. In this case the playbook removes the
+# plugins and the folders of the old Ruby version, and installs the plugins
+# again.
+- name: Vagrant - check that Vagrant is installed
+  stat:
+    path: /usr/bin/vagrant
+  register: vagrant_command
+
+- name: Vagrant - plugins
+  when: vagrant_command.stat.exists
+  become: true
+  become_user: "{{ user }}"
+  block:
+    - name: Vagrant - read the plugins
+      command: vagrant plugin list
+      register: vagrant_plugin_list
+      changed_when: false
+      failed_when: false
+
+    - name: Vagrant - remove the plugins that stop Vagrant
+      shell: |
+        set -e
+        vagrant plugin expunge --force
+        if [ -d "$HOME/.vagrant.d/gems" ]; then
+            find "$HOME/.vagrant.d/gems" -mindepth 1 -maxdepth 1 -type d \
+                ! -name "$(ruby -e 'print RUBY_VERSION')" -exec rm -rf {} +
+        fi
+      when: vagrant_plugin_list.rc != 0
+
+    - name: Vagrant - install the plugins
+      command: "vagrant plugin install {{ item }}"
+      loop: "{{ vagrant_plugins }}"
+      when: >-
+        vagrant_plugin_list.rc != 0
+        or vagrant_plugin_list.stdout is not search('^' ~ (item | regex_escape) ~ ' \\(', multiline=True)

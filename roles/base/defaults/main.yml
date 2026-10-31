@@ -67,7 +67,10 @@ essential_packages:
   - libvirt-clients
   - libvirt-daemon-system
   - virt-manager
+  - vagrant
   - vagrant-libvirt
+  # Debian boxes mount /vagrant over NFS
+  - nfs-kernel-server
   - ansible-lint
   - inkscape
   - audacity
@@ -375,6 +378,12 @@ nvm_version: v0.40.3
 # Node.js version (with the "v") that nvm installs and sets as the default.
 # Programs that start from the desktop use it too, for example Mason in Neovim.
 nvm_node_version: v24.2.0
+
+# Vagrant plugins that the playbook installs for you (vagrant-libvirt is a
+# Debian package). winrm and winrm-elevated are for Windows boxes.
+vagrant_plugins:
+  - winrm
+  - winrm-elevated
 
 # Suckless terminal
 # Font size in pixels. 15 px is about 11 pt (ui_font_size) at 100 dpi.
