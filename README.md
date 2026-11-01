@@ -45,6 +45,7 @@ items that are different.
 | Editor        | Neovim, LazyVim | `nvim/`                               |
 | Screenshots   | flameshot | `roles/base/tasks/main.yml` ("Configure flameshot") |
 | Clipboard     | CopyQ    | `roles/base/tasks/main.yml` ("Configure CopyQ") |
+| Remote desktop | Remmina (VNC) | `essential_packages` in `defaults/main.yml` |
 | Login screen  | lightdm  | `lightdm-gtk-greeter.conf.j2`                |
 | GTK apps      | Adwaita-dark, Papirus-Dark icons | `gtk-settings.ini.j2`, `.gtkrc-2.0.j2` |
 

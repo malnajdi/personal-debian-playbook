@@ -29,6 +29,7 @@
 * st 0.9.3 (was 0.8.2) with the scrollback, alpha, boxdraw, ligatures, undercurl, newterm, copyurl and anysize patches. The mouse wheel scrolls the history, the background is transparent (the text is not), Neovim shows curly underlines, and st fills its tile.
 * Power settings menu (in the power menu): keep awake (coffee icon in the bar), screen off time, lock when the screen turns off, and sleep when idle (not while sound plays). The screen locks before sleep, and the power button opens the power menu. The NVIDIA driver keeps the video memory during sleep.
 * autorandr keeps the monitor layout with the refresh rates, and applies it at login, when a monitor connects or disconnects, and after sleep. picom syncs to the primary monitor, so it draws at its refresh rate.
+* Remmina for remote desktops (VNC), in the application grid.
 
 ### Fixes
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).

@@ -115,6 +115,9 @@ essential_packages:
   - libgdbm-compat-dev
   - uuid-dev
   - tk-dev
+  # Remote desktop (VNC)
+  - remmina
+  - remmina-plugin-vnc
   # - everdo
 
 # Packages for the desktop session: X server, compositor, notifications,
