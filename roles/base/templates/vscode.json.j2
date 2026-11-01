@@ -21,6 +21,9 @@
         "*.ipynb": "jupyter-notebook"
     },
     "workbench.startupEditor": "none",
+    // VSCode draws its dialogs. The GTK dialogs of the snap cannot load the SVG
+    // icons of Papirus, and VSCode crashes (for example at commit).
+    "window.dialogStyle": "custom",
     "explorer.confirmDragAndDrop": false,
     "zenMode.hideLineNumbers": false,
     "zenMode.fullScreen": false,

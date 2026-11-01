@@ -32,6 +32,7 @@
 * Remmina for remote desktops (VNC), in the application grid.
 
 ### Fixes
+* VSCode does not crash at commit: it draws its own dialogs (`window.dialogStyle`), because the GTK dialogs of the snap cannot load the Papirus icons.
 * `code` and other snap commands work in the terminal: bash adds `/snap/bin` to `PATH`.
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).
 * The i386 architecture is added with `dpkg --add-architecture`.
