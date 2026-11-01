@@ -32,6 +32,7 @@
 * Remmina for remote desktops (VNC), in the application grid.
 
 ### Fixes
+* `code` and other snap commands work in the terminal: bash adds `/snap/bin` to `PATH`.
 * APT sources use the deb822 format (`/etc/apt/sources.list.d/debian.sources`).
 * The i386 architecture is added with `dpkg --add-architecture`.
 * Packages renamed or removed in Debian 13: `exa` to `eza`, `compton` to `picom`, `ibus-table-emoji` to `ibus-table-emoticon`, `pulseaudio` to PipeWire.

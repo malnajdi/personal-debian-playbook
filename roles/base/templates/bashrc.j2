@@ -5,6 +5,10 @@
 export EDITOR={{ default_editor }}
 export VISUAL={{ default_editor }}
 
+# Snap applications (code). /etc/profile.d adds /snap/bin only in login shells,
+# and the X session and st do not start login shells.
+[[ -d /snap/bin && ":$PATH:" != *":/snap/bin:"* ]] && export PATH="$PATH:/snap/bin"
+
 # The rest is only for interactive shells
 [[ $- == *i* ]] || return
 
